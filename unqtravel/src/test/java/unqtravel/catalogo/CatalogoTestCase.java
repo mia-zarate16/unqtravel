@@ -2,6 +2,7 @@ package unqtravel.catalogo;
 
 import static org.mockito.Mockito.*;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +46,7 @@ public class CatalogoTestCase {
 	c4 = new CriterioPrecio(5000.0);
 	
 	List<CriterioBusqueda> listaCA = new ArrayList<>(); listaCA.add(c2); listaCA.add(c3);
-	List<CriterioBusqueda> listaCO = new ArrayList<>(); listaCA.add(c1); listaCA.add(c4);
+	List<CriterioBusqueda> listaCO = new ArrayList<>(); listaCO.add(c1); listaCO.add(c4);
 	
 	cA = new CriterioAND(listaCA);
 	cO = new CriterioOR(listaCO);
@@ -67,11 +68,34 @@ public class CatalogoTestCase {
 	
   @Test
   void testVerificarCriteriosSimples() {
+	// Exercise
+    List<EntidadCatalogo> filt1 = catTest.buscar(c1);
+    List<EntidadCatalogo> filt2 = catTest.buscar(c2);
+    List<EntidadCatalogo> filt3 = catTest.buscar(c3);
+    List<EntidadCatalogo> filt4 = catTest.buscar(c4);
     
+    // Verify
+    Assertions.assertTrue(filt1.contains(e1)); Assertions.assertTrue(filt1.contains(e2)); 
+    Assertions.assertTrue(filt2.contains(e2)); Assertions.assertTrue(filt2.contains(e3)); 
+    Assertions.assertTrue(filt3.contains(e2)); Assertions.assertTrue(filt3.contains(e4)); 
+    Assertions.assertTrue(filt4.contains(e1)); Assertions.assertTrue(filt4.contains(e3)); 
   }
   
   @Test
   void testVerificarCriteriosComplejos() {
-    
+	// Exercise
+	List<EntidadCatalogo> filt1 = catTest.buscar(cA);
+	List<EntidadCatalogo> filt2 = catTest.buscar(cO);
+	List<EntidadCatalogo> filt3 = catTest.buscar(cN);
+	    
+	// Verify
+	Assertions.assertTrue(filt1.contains(e2)); 
+	Assertions.assertFalse(filt1.contains(e1)); Assertions.assertFalse(filt1.contains(e3)); Assertions.assertFalse(filt1.contains(e4));
+	
+	Assertions.assertTrue(filt2.contains(e1)); Assertions.assertTrue(filt2.contains(e2)); Assertions.assertTrue(filt2.contains(e3)); 
+	Assertions.assertFalse(filt2.contains(e4));
+	
+	Assertions.assertTrue(filt3.contains(e1)); Assertions.assertTrue(filt3.contains(e4)); 
+	Assertions.assertFalse(filt3.contains(e2)); Assertions.assertFalse(filt3.contains(e3));
   }
 }

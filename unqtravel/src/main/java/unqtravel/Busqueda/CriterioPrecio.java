@@ -12,7 +12,7 @@ public class CriterioPrecio implements CriterioBusqueda {
 	
 	@Override
 	public boolean cumple(EntidadCatalogo entidad) {
-		return entidad.getPrecioBase() == this.precio;
+		return entidad.getPrecioBase() <= this.precio;
 	}
 
 }
