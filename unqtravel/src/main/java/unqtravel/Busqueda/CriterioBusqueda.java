@@ -3,5 +3,5 @@ package unqtravel.Busqueda;
 import unqtravel.catalogo.*;
 
 public interface CriterioBusqueda {
-  abstract public boolean cumple(Catalogo catalogo);
+  abstract public boolean cumple(EntidadCatalogo entidad);
 }
