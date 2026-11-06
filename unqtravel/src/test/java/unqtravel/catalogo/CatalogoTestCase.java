@@ -41,7 +41,7 @@ public class CatalogoTestCase {
 	catTest.agregarAlCatalogo(e3); catTest.agregarAlCatalogo(e4); 
 	
 	c1 = new CriterioNombre("Nombre Generico");
-	c2 = new CriterioCategoria("ALOJAMIENTO");
+	c2 = new CriterioCategoria(CategoriaServicio.ALOJAMIENTO);
 	c3 = new CriterioDisponibilidad();
 	c4 = new CriterioPrecio(5000.0);
 	
