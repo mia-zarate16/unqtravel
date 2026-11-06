@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 
 public class ServicioIndividual implements EntidadCatalogo{
@@ -51,8 +52,8 @@ public class ServicioIndividual implements EntidadCatalogo{
 		return this.descuento;
 	}
 	
-	public CategoriaServicio getCategoria() {
-		return this.categoria;
+	public Set<CategoriaServicio> getCategoria() {
+		return Set.of(categoria);
 	}
 	
 	public List<AtributoDinamico> getAtributosDinamicos() {

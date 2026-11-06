@@ -4,15 +4,15 @@ import unqtravel.catalogo.*;
 
 public class CriterioCategoria implements CriterioBusqueda {
 
-	private String categoria;
+	private CategoriaServicio categoria;
 	
-	public CriterioCategoria(String categoria) {
+	public CriterioCategoria(CategoriaServicio categoria) {
 	  this.categoria = categoria;
 	}
 
 	@Override
 	public boolean cumple(EntidadCatalogo entidad) {
-		return entidad.getCategoria() == this.categoria;
+		return entidad.getCategoria().contains(this.categoria);
 	}
 
 }
