@@ -1,5 +1,6 @@
 package unqtravel.reservaYSusEstados;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,13 +8,17 @@ import unqtravel.catalogo.EntidadCatalogo;
 
 public class Reserva {
 	
+	private String id;
+	private double precioFinal;
+	private LocalDate fechaReserva;
+	private LocalDate fechaPrestacion;
 	private EstadoReserva estadoActual;
 	private List<EntidadCatalogo> items;
 	
 	
 	//									CONSTRUCTOR
 	public Reserva() {
-		super();
+		fechaDeReserva = LocalDate.now();
 		estadoActual = new SolicitudPendiente();
 		items = new ArrayList<>();
 	}
@@ -29,6 +34,10 @@ public class Reserva {
 	public List<EntidadCatalogo> getItems() {
 	    return new ArrayList<>(items);
 	}
+	
+	public LocalDate getFechaReserva() { return this.fechaReserva; }
+	
+	public String getId() { return this.id; }
 	
 	
 	//									MÉTODOS DE ESTADO
