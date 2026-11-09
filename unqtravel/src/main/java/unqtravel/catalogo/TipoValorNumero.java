@@ -1,10 +1,16 @@
 package unqtravel.catalogo;
 
-public class TipoValorNumero extends TipoValorDinamico{
+public class TipoValorNumero implements TipoValorDinamico{
 
 	@Override
-	public boolean esValido(Number numero) {
-		return numero != null;
-	}
+    public Double convertir(String valor) {
+        try {
+            return Double.valueOf(valor);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(
+                "El valor ingresado no es un número.", e
+            );
+        }
+    }
 	
 }

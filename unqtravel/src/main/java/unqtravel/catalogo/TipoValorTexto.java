@@ -1,9 +1,13 @@
 package unqtravel.catalogo;
 
-public class TipoValorTexto extends TipoValorDinamico{
+public class TipoValorTexto implements TipoValorDinamico{
 	
 	@Override
-	public boolean esValido(String text) {
-		return (text != null) && (!text.isBlank()); // Para evaluar el caso en el que texto recibido solo tenga espacios.
+	public Object convertir(String valor) {
+	    if (valor == null || valor.isBlank()) {
+	        throw new IllegalArgumentException("El texto no puede estar vacío.");
+	    }
+	    return valor;
 	}
+	
 }

@@ -15,30 +15,36 @@ public class TipoValorBooleanoTest {
 	}
 	
 	@Test
-	public void testBooleanoTrueValido() {
-		//EXERCISE
-		boolean resultado = tipo.esValido(true);
-		
-		//VERIFY
-		assertTrue(resultado);
-	}
+    public void testConvertirTrue() {
+        // EXERCISE
+        Object resultado = tipo.convertir("true");
+
+        // VERIFY
+        assertEquals(Boolean.TRUE, resultado);
+    }
 	
 	@Test
-	public void testBooleanoFalseValido() {
-		//EXERCISE
-		boolean resultado = tipo.esValido(false);
-		
-		//VERIFY
-		assertTrue(resultado);
-	}
+    public void testConvertirFalse() {
+        // EXERCISE
+        Object resultado = tipo.convertir("false");
+
+        // VERIFY
+        assertEquals(Boolean.FALSE, resultado);
+    }
 	
 	@Test
-	public void testBooleanoNuloInvalido() {
-		//EXERCISE
-		boolean resultado = tipo.esValido((Boolean) null);
-		
-		//VERIFY
-		assertFalse(resultado);
-	}
+    public void testConvertirTrueEnMayusculas() {
+        // EXERCISE
+        Object resultado = tipo.convertir("TRUE");
+
+        // VERIFY
+        assertEquals(Boolean.TRUE, resultado);
+    }
+	
+	@Test
+    public void testConvertirTextoInvalido() {
+        // EXERCISE - VERIFY
+        assertThrows(IllegalArgumentException.class, () -> {tipo.convertir("quizas");});
+    }
  
 }

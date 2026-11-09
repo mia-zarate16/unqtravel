@@ -11,116 +11,106 @@ import org.junit.jupiter.api.Test;
 public class AtributoDinamicoTest {
 	
 	private AtributoDinamico capacidadObligatorio;
-	private AtributoDinamico capacidadNoObligatorio;
-	private AtributoDinamico ratingObligatorio;
-	private AtributoDinamico ratingNoObligatorio;
 	private AtributoDinamico politicaMObligatoria;
 	private AtributoDinamico fechaSalida;
 	
 	@BeforeEach
 	public void setUp() {
-		capacidadObligatorio = new AtributoDinamico("CapacidadMaxima", true, new TipoValorNumero());
-		capacidadNoObligatorio = new AtributoDinamico("CapacidadMaxima", false, new TipoValorNumero());
-		ratingObligatorio = new AtributoDinamico("RatingEstrellas", true, new TipoValorNumero());
-		ratingNoObligatorio = new AtributoDinamico("RatingEstrellas", false, new TipoValorNumero());
-		politicaMObligatoria = new AtributoDinamico ("PoliticaMascota", true, new TipoValorBooleano());
-		fechaSalida = new AtributoDinamico("FechaDeSalida", true, new TipoValorFecha());
+		capacidadObligatorio = new AtributoDinamico("CapacidadMaxima", true, new TipoValorNumero(), "9");
+		politicaMObligatoria = new AtributoDinamico ("PoliticaMascota", true, new TipoValorBooleano(), "false");
+		fechaSalida = new AtributoDinamico("FechaDeSalida", true, new TipoValorFecha(), "2026-12-15");
 	}
 	
 	@Test
 	public void testAtributoNumericoValido() {
-		//SETUP
-		capacidadObligatorio.asignarValor(new ValorNumero(9));
-		
 		//EXERCISE
-		boolean resultado = capacidadObligatorio.esValido();
+		Object resultado = capacidadObligatorio.getValor();
 		
 		//VERIFY
-		assertTrue(resultado);
+		assertEquals(Double.valueOf(9), resultado);
 	}
 	
 	@Test
 	public void testAtributoNumericoInvalido() {
-		//SETUP
-		capacidadObligatorio.asignarValor(new ValorTexto("nueve"));
-		
-		//EXERCISE
-		boolean resultado = capacidadObligatorio.esValido();
-		
-		//VERIFY
-		assertFalse(resultado);
-		}
-	
-	@Test
-	public void testAtributoObligatorioSinValorAsignado() {
-		//EXERSICE
-		boolean resultado = ratingObligatorio.esValido();
-		
-		//VERIFY
-		assertFalse(resultado);
+		// EXERCISE Y VERYFY
+        assertThrows(IllegalArgumentException.class, 
+        		() -> new AtributoDinamico("CapacidadMaxima", true, new TipoValorNumero(), "nueve"));
 	}
 	
 	@Test
-	public void testAtributoNoObligatorioSinValorAsignado() {
-		//EXERCISE
-		boolean resultado = ratingNoObligatorio.esValido();
-		
-		//VERIFY
-		assertTrue(resultado);
-		}
+    public void testAsignarNuevoValorNumerico() {
+        // EXERCISE
+        capacidadObligatorio.asignarValor("15");
+
+        // VERIFY
+        assertEquals(Double.valueOf(15), capacidadObligatorio.getValor());
+    }
 	
 	@Test
-	public void testAtributoObligatorioConValorAsignado() {
-		//SETUP
-		politicaMObligatoria.asignarValor(new ValorBooleano(false));
-		
-		//EXERCISE
-		boolean resultado = politicaMObligatoria.esValido();
-		
-		//VERIFY
-		assertTrue(resultado);
-	}
+    public void testNoAsignarValorNumericoIncompatible() {
+        // EXERCISE
+        assertThrows(IllegalArgumentException.class, 
+        		() -> capacidadObligatorio.asignarValor("veinte"));
+
+        // VERIFY
+        assertEquals(Double.valueOf(9), capacidadObligatorio.getValor());
+    }
 	
 	@Test
-	public void testAtributoNoObligatorioConValorIncompatible() {
+    public void testAtributoBooleanoConValorFalso() {
+		// EXERCISE
+        Object resultado = politicaMObligatoria.getValor();
+
+        // VERIFY
+        assertEquals(Boolean.FALSE, resultado);
+    }
+	
+	@Test
+    public void testAtributoBooleanoInvalido() {
+		// EXERCISE Y VERIFY
+        assertThrows(IllegalArgumentException.class, 
+        		() -> new AtributoDinamico("PoliticaMascota", true, new TipoValorBooleano(), "quizas"));
+    }
+	
+	@Test
+    public void testAtributoFechaValido() {
+		// EXERCISE
+        Object resultado = fechaSalida.getValor();
+
+        // VERIFY
+        assertEquals(LocalDate.of(2026, 12, 15), resultado);
+    }
+	
+	@Test
+    public void testAtributoFechaInvalido() {
+		// EXERCISE Y VERIFY
+        assertThrows(IllegalArgumentException.class, 
+        		() -> new AtributoDinamico("FechaDeSalida", true, new TipoValorFecha(), "15/12/2026"));
+    }
+	
+	@Test
+    public void testAtributoTextoValido() {
 		// SETUP
-	    capacidadNoObligatorio.asignarValor(new ValorTexto("veinte"));
+        AtributoDinamico destino = new AtributoDinamico("Destino", true, new TipoValorTexto(), "Argentina");
 
-	    // EXERCISE
-	    boolean resultado = capacidadNoObligatorio.esValido();
+        // EXERCISE
+        Object resultado = destino.getValor();
 
-	    // VERIFY
-	    assertFalse(resultado);
-	}
+        // VERIFY
+        assertEquals("Argentina", resultado);
+    }
 	
 	@Test
-	public void testAtributoBooleanoObligatorioConValorFalso() {
-		// SETUP
-		politicaMObligatoria.asignarValor(new ValorBooleano(false));
-
-	    // EXERCISE
-	    boolean resultado = politicaMObligatoria.esValido();
-
-	    // VERIFY
-	    assertTrue(resultado);
-	}
+    public void testConstructorRechazaValorNulo() {
+		// EXERCISE Y VERIFY
+        assertThrows(NullPointerException.class, 
+        		() -> new AtributoDinamico("CapacidadMaxima", true, new TipoValorNumero(), null));
+    }
 	
 	@Test
-	public void testAtributoFechaObligatorioConValorValido() {
-		// SETUP
-		fechaSalida.asignarValor(new ValorFecha(LocalDate.of(2026, 12, 15)));
-
-	    // EXERCISE
-	    boolean resultado = fechaSalida.esValido();
-
-	    // VERIFY
-	    assertTrue(resultado);
-	}
-	
-	@Test
-	public void testIsEsObligatorio() {
+	public void testIsObligatorio() {
 		//EXERCISE
-		boolean resultado = capacidadObligatorio.isEsObligatorio();
+		boolean resultado = capacidadObligatorio.isObligatorio();
 		
 		//VERIFY
 		assertTrue(resultado);
@@ -131,7 +121,7 @@ public class AtributoDinamicoTest {
 		// SETUP
 	    TipoValorNumero tipoN = new TipoValorNumero();
 	    
-	    AtributoDinamico ratingN = new AtributoDinamico("RatingEstrellas", true, tipoN);
+	    AtributoDinamico ratingN = new AtributoDinamico("RatingEstrellas", true, tipoN, "5");
 
 	    // EXERCISE
 	    TipoValorDinamico resultado = ratingN.getTipoValor();
@@ -151,15 +141,11 @@ public class AtributoDinamicoTest {
 	
 	@Test
 	public void testGetValor() {
-		//SETUP
-		ValorFecha nacimiento = new ValorFecha(LocalDate.of(2001, 8, 25));
-		fechaSalida.asignarValor(nacimiento);
-		
 		// EXERCISE
-	    ValorDinamico resultado = fechaSalida.getValor();
+        Object resultado = fechaSalida.getValor();
 
-	    // VERIFY
-	    assertEquals(nacimiento, resultado);
+        // VERIFY
+        assertEquals(LocalDate.of(2026, 12, 15), resultado);
 	}
 	
 }

@@ -6,16 +6,17 @@ public class AtributoDinamico {
 	private String nombre;
 	private boolean esObligatorio;
 	private TipoValorDinamico tipoValor;
-	private ValorDinamico valor;
+	private Object valor;
 	
 	
 	//										CONSTRUCTOR
-	public AtributoDinamico(String nombre, boolean esObligatorio, TipoValorDinamico tipoValor) {
+	public AtributoDinamico(String nombre, boolean esObligatorio, TipoValorDinamico tipoValor, String valor) {
 		super();
 		this.nombre = Objects.requireNonNull(nombre);
 		this.esObligatorio = esObligatorio;
 		this.tipoValor = Objects.requireNonNull(tipoValor);
-		this.valor = null;
+		this.valor = Objects.requireNonNull(this.tipoValor.convertir(Objects.requireNonNull(valor, "El valor no puede ser nulo.")),
+	                "La conversión no puede devolver null.");
 	}
 
 	
@@ -24,7 +25,7 @@ public class AtributoDinamico {
 		return this.nombre;
 	}
 
-	public boolean isEsObligatorio() {
+	public boolean isObligatorio() {
 		return this.esObligatorio;
 	}
 
@@ -34,23 +35,14 @@ public class AtributoDinamico {
 	}
 
 
-	public ValorDinamico getValor() {
+	public Object getValor() {
 		return this.valor;
 	}
 	
 	
 	//										OTROS
-	public void asignarValor(ValorDinamico valor) {
-		this.valor = valor; 
-	}
-	
-	public boolean esValido() {
-		if (this.valor == null) {
-			// Ya que si es obligatorio pero no tiene valor asignado entonces es falso.
-			return !this.esObligatorio;
-		}
-		
-		return this.valor.esValidoPara(this.tipoValor);
+	public void asignarValor(String nuevoValor) {
+		this.valor = Objects.requireNonNull(tipoValor.convertir(nuevoValor), "El valor no puede ser nulo.");
 	}
 	
 }
