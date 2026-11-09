@@ -15,29 +15,26 @@ public class TipoValorTextoTest {
 	}
 	
 	@Test
-    public void testTextoValido() {
+    public void testConvertirTextoValido() {
         // EXERCISE
-        boolean resultado = tipo.esValido("Hotel Central");
+        Object resultado = tipo.convertir("Hotel Central");
 
         // VERIFY
-        assertTrue(resultado);
+        assertEquals("Hotel Central", resultado);
     }
 	
 	@Test
-    public void testTextoConEspaciosInvalido() {
+    public void testConvertirTextoConEspaciosInternos() {
         // EXERCISE
-        boolean resultado = tipo.esValido("   ");
+        Object resultado = tipo.convertir("Hotel Gran Central");
 
         // VERIFY
-        assertFalse(resultado);
+        assertEquals("Hotel Gran Central", resultado);
     }
 	
 	@Test
-    public void testTextoNuloInvalido() {
-		// EXERCISE
-        boolean resultado = tipo.esValido((String) null);
-
-        // VERIFY
-        assertFalse(resultado);
+    public void testConvertirTextoConEspaciosEnBlanco() {
+        // EXERCISE - VERIFY
+        assertThrows(IllegalArgumentException.class, () -> {tipo.convertir("   ");});
     }
 }

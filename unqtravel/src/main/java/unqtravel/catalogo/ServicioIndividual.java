@@ -78,23 +78,15 @@ public class ServicioIndividual implements EntidadCatalogo{
 	
 	//										VALIDACIÓN DE ATRIBUTOS
 	public boolean esValido() {
-		return sonValidosLosFijos() && sonValidosLosDinamicos();
-	}
-	
-	public boolean sonValidosLosFijos() {
 		return esValidoNombre() && esValidoID();
 	}
-	
+
 	public boolean esValidoNombre() {
 		return this.nombre != null && !this.nombre.isBlank();
 	}
 	
 	public boolean esValidoID() {
 		return this.id != null && !this.id.isBlank();
-	}
-	
-	public boolean sonValidosLosDinamicos() {
-		return this.atributosDinamicos.values().stream().allMatch(AtributoDinamico :: esValido);
 	}
 	
 	
@@ -123,7 +115,7 @@ public class ServicioIndividual implements EntidadCatalogo{
 	    return this.atributosDinamicos.containsKey(nombre);
 	}
 	
-	public void asignarValorAtributo(AtributoDinamico a, ValorDinamico valor) {
+	public void asignarValorAtributo(AtributoDinamico a, String valor) {
 		Objects.requireNonNull(a);
 	    if (atributosDinamicos.get(a.getNombre()) != a) {
 	        throw new IllegalArgumentException(

@@ -15,38 +15,45 @@ public class TipoValorNumeroTest {
 	}
 	
 	@Test
-	public void testNumeroPositivoValido() {
-		//EXERCISE
-		boolean resultado = tipo.esValido(9);
-		
-		//VERIFY
-		assertTrue(resultado);
-	}
+    public void testConvertirNumeroPositivo() {
+        // EXERCISE
+        Object resultado = tipo.convertir("9");
+
+        // VERIFY
+        assertEquals(Double.valueOf(9), resultado);
+    }
+	
 	
 	@Test
-	public void testNumeroNegativoValido() {
-		//EXERCISE
-		boolean resultado = tipo.esValido(-9);
-		
-		//VERIFY
-		assertTrue(resultado);
-	}
+    public void testConvertirNumeroNegativo() {
+        // EXERCISE
+        Object resultado = tipo.convertir("-9");
+
+        // VERIFY
+        assertEquals(Double.valueOf(-9), resultado);
+    }
 	
 	@Test
-	public void testNumeroCeroValido() {
-		//EXERCISE
-		boolean resultado = tipo.esValido(0);
-		
-		//VERIFY
-		assertTrue(resultado);
-	}
+    public void testConvertirCero() {
+        // EXERCISE
+        Object resultado = tipo.convertir("0");
+
+        // VERIFY
+        assertEquals(Double.valueOf(0), resultado);
+    }
 	
 	@Test
-	public void testNuloInvalido() {
-		//EXERCISE
-		boolean resultado = tipo.esValido((Number) null);
-		
-		//VERIFY
-		assertFalse(resultado);
-	}
+    public void testConvertirNumeroDecimal() {
+        // EXERCISE
+        Object resultado = tipo.convertir("9.5");
+
+        // VERIFY
+        assertEquals(Double.valueOf(9.5), resultado);
+    }
+	
+	@Test
+    public void testConvertirTextoInvalido() {
+        // EXERCISE Y VERIFY
+        assertThrows(IllegalArgumentException.class, () -> {tipo.convertir("nueve");});
+    }
 }

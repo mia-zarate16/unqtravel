@@ -2,6 +2,9 @@ package unqtravel.catalogo;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 
@@ -24,32 +27,35 @@ public class ServicioIndividualTest {
     @BeforeEach
     public void setUp() {
         operador = mock(Proveedor.class);
+        
+        capacidadV1 = mock(AtributoDinamico.class);
+        capacidadV2 = mock(AtributoDinamico.class);
+        ratingV1 = mock(AtributoDinamico.class);
+        ratingV2 = mock(AtributoDinamico.class);
+        politicaMV1 = mock(AtributoDinamico.class);
+        
+        when(capacidadV1.getNombre()).thenReturn("CapacidadMaxima");
+        when(capacidadV2.getNombre()).thenReturn("CapacidadMaxima");
+        when(ratingV1.getNombre()).thenReturn("RatingEstrellas");
+        when(ratingV2.getNombre()).thenReturn("RatingEstrellas");
+        when(politicaMV1.getNombre()).thenReturn("PoliticaMascotas");
 
         servicioHotel = new ServicioIndividual("1", "NocheDeHotelCentral", operador, 120.0, 0.10,
             "Noche en un hotel central", CategoriaServicio.ALOJAMIENTO);
         
         servicioExcursion = new ServicioIndividual("2", "ExcursionGuiadaMuseo", operador, 100.0, 0.10, 
 				"Excursion guiada al museo", CategoriaServicio.EXCURSION);
-        
-        capacidadV1 = new AtributoDinamico("CapacidadMaxima", true, new TipoValorNumero());
-        capacidadV2 = new AtributoDinamico("CapacidadMaxima", false, new TipoValorTexto());
-        ratingV1 = new AtributoDinamico("RatingEstrellas", false, new TipoValorNumero());
-        ratingV2 = new AtributoDinamico("RatingEstrellas", true, new TipoValorNumero());
-        politicaMV1 = new AtributoDinamico("PoliticaMascotas", false, new TipoValorBooleano());
     }
 	
 	
-	@Test
-	public void testPermiteAgregarAtributo() {
-		//SETUP
-		servicioHotel.agregarAtributo(capacidadV1);
-		
-		//EXERCISE 
-		boolean resultado = servicioHotel.tieneAtributo("CapacidadMaxima");
-		
-		//VERIFY
-		assertTrue(resultado);
-	}
+    @Test
+    public void testPermiteAgregarAtributo() {
+        // EXERCISE
+        servicioHotel.agregarAtributo(capacidadV1);
+
+        // VERIFY
+        assertTrue(servicioHotel.tieneAtributo("CapacidadMaxima"));
+    }
 	
 	@Test
 	public void testNoPermiteAgregarAtributosRepetidos() {
@@ -77,7 +83,6 @@ public class ServicioIndividualTest {
 		
 		//VERIFY
 		assertFalse(servicioHotel.tieneAtributo("RatingEstrellas"));
-		
 	}
 	
 	@Test
@@ -94,107 +99,50 @@ public class ServicioIndividualTest {
 	
 	@Test
 	public void testSePuedeAsignarValorAlAtributo() {
-		//SETUP
-		servicioHotel.agregarAtributo(ratingV2);
-		ValorNumero numero = new ValorNumero(25);
-		
-		// EXERCISE
-		servicioHotel.asignarValorAtributo(ratingV2, numero);
-		
-		//VERIFY
-		
-		assertSame(numero, servicioHotel.obtenerAtributo("RatingEstrellas").getValor());
-		assertTrue(ratingV2.esValido());
-	}
-	
-	@Test
-	public void testNoSePuedeAsignarValorAlAtributo() {
-		//SETUP
-		servicioHotel.agregarAtributo(politicaMV1);
-		servicioHotel.agregarAtributo(ratingV2);
-		
-		//EXERCISE Y VERIFY
-		assertThrows(IllegalArgumentException.class, () -> servicioHotel.asignarValorAtributo(capacidadV1, new ValorNumero(9)));
-	}
-	
-	@Test
-	public void testServicioConAtributoObligatorioSinValor() {
-	    // SETUP
-		servicioHotel.agregarAtributo(capacidadV1);
+		// SETUP
+        servicioHotel.agregarAtributo(ratingV2);
 
-	    // EXERCISE
-	    boolean resultado = servicioHotel.sonValidosLosDinamicos();
+        // EXERCISE
+        servicioHotel.asignarValorAtributo(ratingV2, "25");
 
-	    // VERIFY
-	    assertFalse(resultado);
+        // VERIFY
+        verify(ratingV2).asignarValor("25");
 	}
 	
 	@Test
-	public void testServicioConAtributosValidos() {
-	    // SETUP
-		servicioExcursion.agregarAtributo(capacidadV1);
-		servicioExcursion.agregarAtributo(politicaMV1);
-		servicioExcursion.agregarAtributo(ratingV2);
-		
-		ValorNumero valor1 = new ValorNumero(8);
-		ValorNumero valor2 = new ValorNumero(9);
-		
-		servicioExcursion.asignarValorAtributo(capacidadV1, valor1);
-		servicioExcursion.asignarValorAtributo(ratingV2, valor2);
+    public void testNoSePuedeAsignarValorAlAtributo() {
+        // SETUP
+        servicioHotel.agregarAtributo(capacidadV1);
 
-	    // EXERCISE
-	    boolean resultado = servicioExcursion.sonValidosLosDinamicos();
+        // EXERCISE Y VERIFY
+        assertThrows(IllegalArgumentException.class, () ->
+            servicioHotel.asignarValorAtributo(capacidadV2, "9")
+        );
 
-	    // VERIFY
-	    assertTrue(resultado);
-	}
+        verify(capacidadV2, never()).asignarValor("9");
+    }
 	
 	@Test
-	public void testEsInvalidoElServicio() {
-		//SETUP
-		ServicioIndividual servicio = new ServicioIndividual("123", "    ", operador, 120.0, 0.10,
-	            "Excursion guiada al museo", CategoriaServicio.EXCURSION);
-		
-		servicio.agregarAtributo(ratingV2);
-		
-		ValorNumero valor2 = new ValorNumero(30);
-		
-		servicio.asignarValorAtributo(ratingV2, valor2);
-		
-		//EXERCISE
-		boolean resultado = servicio.esValido();
-		
-		//VERIFY
-		assertFalse(resultado);
-	}
+    public void testEsInvalidoElServicioPorNombreVacio() {
+        // SETUP
+        ServicioIndividual servicio = new ServicioIndividual("123", "    ", operador, 120.0, 0.10,
+            "Excursion guiada al museo", CategoriaServicio.EXCURSION);
+
+        // EXERCISE
+        boolean resultado = servicio.esValido();
+
+        // VERIFY
+        assertFalse(resultado);
+    }
 	
 	@Test
-	public void testEsValidoElServicio() {
-		//SETUP
-		servicioExcursion.agregarAtributo(politicaMV1);
-		
-		//EXERCISE
-		boolean resultado = servicioExcursion.esValido();
-		
-		//VERIFY
-		assertTrue(resultado);
-	}
-	
-	@Test
-	public void testEsInvalidoElServicioPorAtributoDinamicoInvalido() {
-		//SETUP
-		servicioHotel.agregarAtributo(capacidadV1);
-	    
-	    ValorTexto texto = new ValorTexto("nueve");
-	    
-	    servicioHotel.asignarValorAtributo(capacidadV1, texto);
-	    
-	    //EXERCISE
-	    boolean resultado = servicioHotel.esValido();
-	    
-	    //VERIFY
-	    assertFalse(resultado);
-	}
+    public void testEsValidoElServicio() {
+        // EXERCISE
+        boolean resultado = servicioExcursion.esValido();
+
+        // VERIFY
+        assertTrue(resultado);
+    }
 	
 	@Test
 	public void testPrecioFinalConDescuento() {
@@ -206,20 +154,20 @@ public class ServicioIndividualTest {
 	}
 	
 	@Test
-	public void testObtenerListaDeAtributos() {
-	    // SETUP
-	    servicioHotel.agregarAtributo(capacidadV1);
-	    servicioHotel.agregarAtributo(ratingV2);
+    public void testObtenerListaDeAtributos() {
+        // SETUP
+        servicioHotel.agregarAtributo(capacidadV1);
+        servicioHotel.agregarAtributo(ratingV2);
 
-	    // EXERCISE
-	    List<AtributoDinamico> resultado = servicioHotel.getAtributosDinamicos();
+        // EXERCISE
+        List<AtributoDinamico> resultado =
+            servicioHotel.getAtributosDinamicos();
 
-	    // VERIFY
-	    assertEquals(2, resultado.size());
-
-	    assertTrue(resultado.contains(capacidadV1));
-	    assertTrue(resultado.contains(ratingV2));
-	}
+        // VERIFY
+        assertEquals(2, resultado.size());
+        assertTrue(resultado.contains(capacidadV1));
+        assertTrue(resultado.contains(ratingV2));
+    }
 	
 	@Test
 	public void testConstructorConProveedorNulo() {

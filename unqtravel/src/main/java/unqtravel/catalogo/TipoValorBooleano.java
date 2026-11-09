@@ -1,9 +1,14 @@
 package unqtravel.catalogo;
 
-public class TipoValorBooleano extends TipoValorDinamico{
+public class TipoValorBooleano implements TipoValorDinamico{
 	
 	@Override
-	public boolean esValido(Boolean valor) {
-		return valor != null;
-	}
+    public Boolean convertir(String valor) {
+        if (!valor.equalsIgnoreCase("true") && !valor.equalsIgnoreCase("false")) {
+            throw new IllegalArgumentException(
+                "El valor ingresado no es un booleano."
+            );
+        }
+        return Boolean.valueOf(valor);
+    }
 }

@@ -1,22 +1,7 @@
 package unqtravel.catalogo;
 
-import java.time.LocalDate;
-
-public class TipoValorDinamico {
+public interface TipoValorDinamico {
 	
-	public boolean esValido(String text) {
-		return false;
-	}
+	Object convertir(String valor);
 	
-	public boolean esValido(Number numero) {
-		return false;
-	}
-	
-	public boolean esValido(Boolean valor) {
-		return false;
-	}
-	
-	public boolean esValido(LocalDate date) {
-		return false;
-	}
 }
