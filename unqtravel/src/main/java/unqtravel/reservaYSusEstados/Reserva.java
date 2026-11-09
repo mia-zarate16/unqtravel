@@ -36,4 +36,6 @@ public class Reserva {
 	public void cambiarEstado(EstadoReserva estadoNuevo) {
 		this.estadoActual = estadoNuevo;
 	}
-}
+
+
+
