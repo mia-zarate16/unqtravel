@@ -1,5 +1,6 @@
 package unqtravel.metodoDeTrasladoYTasas;
 
+import unqtravel.reservaYSusEstados.Direccion;
 
 public interface PlataformaTransporte {
 	
