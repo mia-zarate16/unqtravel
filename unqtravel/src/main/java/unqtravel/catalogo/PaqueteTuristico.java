@@ -118,8 +118,6 @@ public class PaqueteTuristico implements EntidadCatalogo{
 		return true;
 	}
 	
-	
-	
 	public void liberarCupos(LocalDate fechaInicio, LocalDate fechaFin, int cantidad) {
 		    items.forEach(item -> item.liberarCupos(fechaInicio, fechaFin, cantidad));
 	}
