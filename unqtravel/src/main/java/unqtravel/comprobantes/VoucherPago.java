@@ -1,14 +1,16 @@
-package unqtravel.metodoDePago;
+package unqtravel.comprobantes;
 
-public class VoucherPago {
+public class VoucherPago implements Comprobante {
 	 
     private final String codigoTransaccion;
  
     public VoucherPago(String codigoTransaccion) {
         this.codigoTransaccion = codigoTransaccion;
     }
- 
-    public String getCodigoTransaccion() {
+    
+    @Override
+    public String getIdentificador() {
         return codigoTransaccion;
     }
+    
 }

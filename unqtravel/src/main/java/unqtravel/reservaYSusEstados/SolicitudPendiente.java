@@ -1,0 +1,30 @@
+package unqtravel.reservaYSusEstados;
+
+import unqtravel.catalogo.EntidadCatalogo;
+
+public class SolicitudPendiente extends EstadoReserva {
+	
+	@Override
+	void agregarServicio(Reserva reserva, EntidadCatalogo item) {
+		reserva.agregarItem(item);
+	}
+	
+	@Override
+	void quitarServicio(Reserva reserva, EntidadCatalogo item) {
+		reserva.quitarItem(item);
+	}
+	
+	@Override
+	void confirmarViaje(Reserva reserva) {
+		if (!reserva.ocuparCupos()) {
+	        throw new OperacionReservaInvalida("No se puede confirmar la reserva ya que no hay disponibilidad suficiente.");
+	    }
+	    reserva.cambiarEstado(new Confirmada());
+	}
+	
+	@Override
+	void cancelarViaje(Reserva reserva) {
+		reserva.cambiarEstado(new Cancelada());
+	}
+	
+}

@@ -22,7 +22,7 @@ public class TrasladoEstandar implements MetodoTraslado {
 	@Override
 	public float calcularCosto(Reserva reserva) {
 		int cantPasajeros = reserva.getCantidad();
-		Direccion direccion = reserva.getdireccionDestino();
+		Direccion direccion = reserva.getDireccionDestino();
 		return plataforma.estimarTraslado(cantPasajeros, direccion);
 	}
 	

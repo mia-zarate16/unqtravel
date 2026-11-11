@@ -21,6 +21,6 @@ public class TrasladoPuntoDeEncuentro implements MetodoTraslado {
 	//									OTROS
 	
 	public boolean hayDisponibilidad(Reserva reserva) {
-		return reserva.getPuntoDeEncuentro().hayDisponibilidad();
+		return reserva.hayDisponibilidadEnPuntoDeEncuentro();
 	}
 }

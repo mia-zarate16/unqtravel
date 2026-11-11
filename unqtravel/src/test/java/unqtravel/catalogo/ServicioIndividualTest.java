@@ -6,6 +6,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +23,9 @@ public class ServicioIndividualTest {
 	private ServicioIndividual servicioHotel;
 	private ServicioIndividual servicioExcursion;
     private Proveedor operador;
-
+    
+    private LocalDate fechaInicio;
+    private LocalDate fechaFin;
     
     @BeforeEach
     public void setUp() {
@@ -40,11 +43,15 @@ public class ServicioIndividualTest {
         when(ratingV2.getNombre()).thenReturn("RatingEstrellas");
         when(politicaMV1.getNombre()).thenReturn("PoliticaMascotas");
 
-        servicioHotel = new ServicioIndividual("1", "NocheDeHotelCentral", operador, 120.0, 0.10,
-            "Noche en un hotel central", CategoriaServicio.ALOJAMIENTO);
+        servicioHotel = new ServicioIndividual("1", "NocheDeHotelCentral", operador,
+        	    120.0, 0.10, "Noche en un hotel central", CategoriaServicio.ALOJAMIENTO, 50);
         
-        servicioExcursion = new ServicioIndividual("2", "ExcursionGuiadaMuseo", operador, 100.0, 0.10, 
-				"Excursion guiada al museo", CategoriaServicio.EXCURSION);
+        servicioExcursion = new ServicioIndividual("2", "ExcursionGuiadaMuseo", operador, 100.0, 0.10,
+                "Excursion guiada al museo", CategoriaServicio.EXCURSION, 20);
+        
+        fechaInicio = LocalDate.of(2026, 11, 10);
+        fechaFin = LocalDate.of(2026, 11, 12);
+        
     }
 	
 	
@@ -116,8 +123,7 @@ public class ServicioIndividualTest {
 
         // EXERCISE Y VERIFY
         assertThrows(IllegalArgumentException.class, () ->
-            servicioHotel.asignarValorAtributo(capacidadV2, "9")
-        );
+            servicioHotel.asignarValorAtributo(capacidadV2, "9"));
 
         verify(capacidadV2, never()).asignarValor("9");
     }
@@ -126,7 +132,7 @@ public class ServicioIndividualTest {
     public void testEsInvalidoElServicioPorNombreVacio() {
         // SETUP
         ServicioIndividual servicio = new ServicioIndividual("123", "    ", operador, 120.0, 0.10,
-            "Excursion guiada al museo", CategoriaServicio.EXCURSION);
+                "Excursion guiada al museo", CategoriaServicio.EXCURSION, 20);
 
         // EXERCISE
         boolean resultado = servicio.esValido();
@@ -172,8 +178,8 @@ public class ServicioIndividualTest {
 	@Test
 	public void testConstructorConProveedorNulo() {
 	    // EXERCISE Y VERIFY
-	    assertThrows(NullPointerException.class, () -> new ServicioIndividual("3", "NocheDeHotelCentral", null, 
-	    		120.0, 0.10, "Noche en un hotel central", CategoriaServicio.ALOJAMIENTO));
+	    assertThrows(IllegalArgumentException.class, () -> new ServicioIndividual("3", "NocheDeHotelCentral", null, 120.0, 0.10,
+                "Noche en un hotel central", CategoriaServicio.ALOJAMIENTO, 50));
 	}
 	
 	@Test
@@ -189,7 +195,7 @@ public class ServicioIndividualTest {
 	public void testServicioConIdNulo() {
 		// SETUP
 	    ServicioIndividual servicio = new ServicioIndividual(null, "NocheDeHotelCentral", operador, 120.0, 0.10,
-	        "Noche en un hotel central", CategoriaServicio.ALOJAMIENTO);
+	            "Noche en un hotel central", CategoriaServicio.ALOJAMIENTO, 50);
 
 	    // EXERCISE
 	    boolean resultado = servicio.esValidoID();
@@ -251,4 +257,96 @@ public class ServicioIndividualTest {
 	    // VERIFY
 	    assertEquals("Noche en un hotel central", resultado);
 	}
+	
+	@Test
+    public void testGetCapacidadMaxima() {
+		//EXERCISE
+		int resultado = servicioHotel.getCapacidadMaxima();
+		
+		//VERIFY
+        assertEquals(50, resultado);
+    }
+	
+	@Test
+    public void testHayDisponibilidadInicialmente() {
+		//EXERCISE
+		boolean resultado = servicioHotel.hayDisponibilidad(fechaInicio, fechaFin, 5);
+		
+		//VERIFY
+		assertTrue(resultado);
+    }
+	
+	@Test
+    public void testNoHayDisponibilidadCuandoSeSuperaLaCapacidad() {
+        //SETUP
+		servicioHotel.ocuparCupos(fechaInicio, fechaFin, 48);
+        
+		//EXERCISE
+		boolean resultado = servicioHotel.hayDisponibilidad(fechaInicio, fechaFin, 3);
+		
+		//VERIFY
+		assertFalse(resultado);
+    }
+	
+	@Test
+    public void testSePuedenOcuparCupos() {
+		//EXERCISE
+        boolean resultado = servicioHotel.ocuparCupos(fechaInicio, fechaFin, 10);
+        
+        //VERIFY
+        assertTrue(resultado);
+
+        assertFalse(servicioHotel.hayDisponibilidad(fechaInicio, fechaFin, 41));
+    }
+	
+	@Test
+    public void testNoSePuedenOcuparCuposSinDisponibilidad() {
+        //SETUP
+		servicioHotel.ocuparCupos(fechaInicio, fechaFin, 48);
+		
+		//EXERCISE
+        boolean resultado = servicioHotel.ocuparCupos(fechaInicio, fechaFin, 3);
+        
+        //VERIFY
+        assertFalse(resultado);
+
+        assertTrue(servicioHotel.hayDisponibilidad(fechaInicio, fechaFin, 2));
+    }
+	
+	@Test
+    public void testSePuedenLiberarCupos() {
+        //SETUP
+		servicioHotel.ocuparCupos(fechaInicio, fechaFin, 10);
+		
+		//EXERCISE
+        servicioHotel.liberarCupos(fechaInicio, fechaFin, 10);
+        
+        //VERIFY
+        assertTrue(servicioHotel.hayDisponibilidad(fechaInicio, fechaFin, 50));
+    }
+	
+	@Test
+    public void testNoSePuedenLiberarCuposNoOcupados() {
+        //EXERCISE Y VERIFY
+		assertThrows(IllegalArgumentException.class, () -> servicioHotel.liberarCupos(fechaInicio, fechaFin, 5));
+    }
+	
+	@Test
+    public void testValidarSolicitudConFechasNulas() {
+        //EXERCISE Y VERIFY
+		assertThrows(NullPointerException.class, () -> servicioHotel.hayDisponibilidad(null, fechaFin, 5));
+    }
+	
+	@Test
+    public void testValidarSolicitudConFechaInicioPosterior() {
+        //EXERCISE Y VERIFY
+		assertThrows(IllegalArgumentException.class, () -> servicioHotel.hayDisponibilidad(fechaFin, fechaInicio, 5));
+    }
+	
+	@Test
+    public void testValidarSolicitudConCantidadCero() {
+        //EXERCISE Y VERIFY
+		assertThrows(IllegalArgumentException.class, () -> servicioHotel.hayDisponibilidad(fechaInicio, fechaFin, 0));
+    }
+	
 }

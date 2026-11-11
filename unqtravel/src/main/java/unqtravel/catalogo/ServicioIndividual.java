@@ -25,9 +25,13 @@ public class ServicioIndividual implements EntidadCatalogo{
 	
 	public ServicioIndividual(String id, String nombre, Proveedor operador, double precioBase, double descuento, 
 			String descripcion, CategoriaServicio categoria, int capacidadMaxima) {
+		super();
+		if(operador == null) {
+			throw new IllegalArgumentException("El operador no puede ser nulo.");
+		}
 		this.id = id;
-		this.nombre = Objects.requireNonNull(nombre);
-		this.operador = Objects.requireNonNull(operador);
+		this.nombre = nombre;
+		this.operador = operador;
 		this.precioBase = precioBase;
 		this.descuento = descuento;
 		this.descripcion = Objects.requireNonNull(descripcion);
