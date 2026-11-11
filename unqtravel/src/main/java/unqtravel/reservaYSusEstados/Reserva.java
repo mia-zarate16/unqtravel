@@ -105,6 +105,10 @@ public class Reserva {
 	    return new ArrayList<>(items);
 	}
 	
+	public LocalDate getFechaReserva() { return this.fechaReserva; }
+	
+	public String getId() { return this.id; }
+	
 	
 	//										OTROS
 	public float precioTotal() {
