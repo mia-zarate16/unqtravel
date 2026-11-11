@@ -2,7 +2,7 @@ package metodoDePago;
 
 import org.junit.jupiter.api.Test;
 
-import unqtravel.metodoDePago.VoucherPago;
+import unqtravel.comprobantes.VoucherPago;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -14,6 +14,6 @@ class VoucherPagoTest {
 
         VoucherPago voucher = new VoucherPago(codigoTransaccion);
 
-        assertEquals(codigoTransaccion, voucher.getCodigoTransaccion());
+        assertEquals(codigoTransaccion, voucher.getIdentificador());
     }
 }

@@ -18,7 +18,7 @@ public class Chaffeur implements MetodoTraslado {
 	//									MÉTODO DEL STRATEGY
 	@Override
 	public float calcularCosto(Reserva reserva) {
-		return traslado.calcularCosto(reserva.getPrecioTotal());
+		return traslado.calcularCosto(reserva.precioTotal());
 	}
 
 

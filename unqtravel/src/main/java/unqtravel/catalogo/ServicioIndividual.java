@@ -1,4 +1,5 @@
 package unqtravel.catalogo;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,20 +17,31 @@ public class ServicioIndividual implements EntidadCatalogo{
 	private String descripcion;
 	private CategoriaServicio categoria;
 	private Map<String, AtributoDinamico> atributosDinamicos; 
+	private int capacidadMaxima;
+	private Map<LocalDate, Integer> ocupados;
 	
 	
 	//										CONSTRUCTOR
 	
 	public ServicioIndividual(String id, String nombre, Proveedor operador, double precioBase, double descuento, 
-			String descripcion, CategoriaServicio categoria) {
+			String descripcion, CategoriaServicio categoria, int capacidadMaxima) {
+		super();
+		if(operador == null) {
+			throw new IllegalArgumentException("El operador no puede ser nulo.");
+		}
 		this.id = id;
-		this.nombre = Objects.requireNonNull(nombre);
-		this.operador = Objects.requireNonNull(operador);
+		this.nombre = nombre;
+		this.operador = operador;
 		this.precioBase = precioBase;
 		this.descuento = descuento;
 		this.descripcion = Objects.requireNonNull(descripcion);
 		this.categoria = Objects.requireNonNull(categoria);
 		this.atributosDinamicos = new HashMap<>();
+		if (capacidadMaxima <= 0) {
+	        throw new IllegalArgumentException("La capacidad máxima debe ser positiva.");
+	    }
+		this.capacidadMaxima = capacidadMaxima;
+		this.ocupados = new HashMap<>();
 	}
 
 	
@@ -67,6 +79,9 @@ public class ServicioIndividual implements EntidadCatalogo{
 		return this.descripcion;
 	}
 	
+	public int getCapacidadMaxima() {
+	    return this.capacidadMaxima;
+	}
 	
 	//										OTROS
 	
@@ -123,5 +138,59 @@ public class ServicioIndividual implements EntidadCatalogo{
 	        );
 	    }
 	    a.asignarValor(valor);
+	}
+	
+	
+	//										MÉTODOS DE CUPOS
+	public boolean hayDisponibilidad(LocalDate fechaInicio,  LocalDate fechaFin, int cantidad) {
+	    validarSolicitud(fechaInicio, fechaFin, cantidad);
+	    for (LocalDate fecha = fechaInicio; !fecha.isAfter(fechaFin); fecha = fecha.plusDays(1)) {
+	        int cantidadOcupada = ocupados.getOrDefault(fecha, 0);
+	        if (cantidad > capacidadMaxima - cantidadOcupada) {
+	            return false;
+	        }
+	    }
+	    return true;
+	}
+	
+	public void validarSolicitud(LocalDate fechaInicio, LocalDate fechaFin, int cantidad) {
+	    Objects.requireNonNull(fechaInicio);
+	    Objects.requireNonNull(fechaFin);
+	    if (fechaInicio.isAfter(fechaFin)) {
+	        throw new IllegalArgumentException("La fecha de inicio no puede ser posterior a la fecha de fin.");
+	    }
+	    if (cantidad <= 0) {
+	        throw new IllegalArgumentException("La cantidad de cupos debe ser positiva.");
+	    }
+	}
+	
+	public boolean ocuparCupos(LocalDate fechaInicio, LocalDate fechaFin, int cantidad) {
+	    if (!hayDisponibilidad(fechaInicio, fechaFin, cantidad)) {
+	        return false;
+	    }
+	    for (LocalDate fecha = fechaInicio; !fecha.isAfter(fechaFin); fecha = fecha.plusDays(1)) {
+	        int cantidadOcupada = ocupados.getOrDefault(fecha, 0);
+	        ocupados.put(fecha, cantidadOcupada + cantidad);
+	    }
+	    return true;
+	}
+	
+	public void liberarCupos(LocalDate fechaInicio, LocalDate fechaFin, int cantidad) {
+	    validarSolicitud(fechaInicio, fechaFin, cantidad);
+	    for (LocalDate fecha = fechaInicio; !fecha.isAfter(fechaFin); fecha = fecha.plusDays(1)) {
+	        int cantidadOcupada = ocupados.getOrDefault(fecha, 0);
+	        if (cantidadOcupada < cantidad) {
+	            throw new IllegalArgumentException("No hay suficientes cupos ocupados para liberar.");
+	        }
+	    }
+	    for (LocalDate fecha = fechaInicio; !fecha.isAfter(fechaFin); fecha = fecha.plusDays(1)) {
+	        int cantidadOcupada = ocupados.get(fecha);
+	        int nuevaCantidad = cantidadOcupada - cantidad;
+	        if (nuevaCantidad == 0) {
+	            ocupados.remove(fecha);
+	        } else {
+	            ocupados.put(fecha, nuevaCantidad);
+	        }
+	    }
 	}
 }

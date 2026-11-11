@@ -1,5 +1,6 @@
 package unqtravel.catalogo;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -92,5 +93,34 @@ public class PaqueteTuristico implements EntidadCatalogo{
 	public boolean estaVacio() {
 	    return items.isEmpty();
 	}
+	
+	
+	//									MÉTODOS DE CUPOS
+	public boolean hayDisponibilidad(LocalDate fechaInicio,LocalDate fechaFin,int cantidad) {
+		return items.stream().allMatch(item -> item.hayDisponibilidad(fechaInicio, fechaFin, cantidad));
+	}
+	
+	public boolean ocuparCupos(LocalDate fechaInicio, LocalDate fechaFin, int cantidad) {
+		if (!hayDisponibilidad(fechaInicio, fechaFin, cantidad)) {
+			return false;
+		}
+		List<EntidadCatalogo> ocupados = new ArrayList<>();
+		for (EntidadCatalogo item : items) {
+		    if (item.ocuparCupos(fechaInicio, fechaFin, cantidad)) {
+		    	ocupados.add(item);
+		    } else {
+		        for (EntidadCatalogo ocupado : ocupados) {
+		           ocupado.liberarCupos(fechaInicio, fechaFin, cantidad);
+		        }
+		        return false;
+		    }
+		}
+		return true;
+	}
+	
+	public void liberarCupos(LocalDate fechaInicio, LocalDate fechaFin, int cantidad) {
+		    items.forEach(item -> item.liberarCupos(fechaInicio, fechaFin, cantidad));
+	}
+	
 	
 }
