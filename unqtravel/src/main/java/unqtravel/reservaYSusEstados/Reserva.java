@@ -1,4 +1,6 @@
 package unqtravel.reservaYSusEstados;
+import unqtravel.metodoDePago.MetodoDePago;
+import unqtravel.notificaciones.ObservadorReserva;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -21,11 +23,15 @@ public class Reserva {
 	private MetodoTraslado metodoDeTraslado;
 	private int cupoDeGuias;
 	private RegistroComprobante registroDeComprobantes;
+	private MetodoDePago metodoDePago;
+	private String email;
+	private List<ObservadorReserva> observadores;
 	
 	
 	//									CONSTRUCTOR
-	public Reserva(String id, LocalDate fechaInicio, LocalDate fechaFin, int cantidad, Direccion direccionDestino,
-			MetodoTraslado metodoDeTraslado, int cupoDeGuias, RegistroComprobante registroDeComprobantes) {
+	public Reserva(String id, LocalDate fechaInicio, LocalDate fechaFin, int cantidad,
+	        Direccion direccionDestino, MetodoTraslado metodoDeTraslado, int cupoDeGuias,
+	        RegistroComprobante registroDeComprobantes, String email) {
 		super();
 		if (id == null || id.isBlank()) {
             throw new IllegalArgumentException("El identificador no puede ser nulo ni vacío.");
@@ -51,6 +57,9 @@ public class Reserva {
 		if (registroDeComprobantes == null) {
 	        throw new IllegalArgumentException("El registro de comprobantes no puede ser nulo.");
 	    }
+		if (email == null || email.isBlank()) {
+		    throw new IllegalArgumentException("El email no puede ser nulo ni vacío.");
+		}
 		this.id = id;
 		this.fechaInicio = fechaInicio;
 		this.fechaFin = fechaFin;
@@ -61,6 +70,8 @@ public class Reserva {
 		this.registroDeComprobantes = registroDeComprobantes;
 		this.estadoActual = new SolicitudPendiente();
 		this.items = new ArrayList<>();
+		this.observadores = new ArrayList<>();
+		this.email= email;
 	}
 	
 	
@@ -149,10 +160,13 @@ public class Reserva {
 	
 	//										MÉTODOS DE ESTADO
 	void cambiarEstado(EstadoReserva estadoNuevo) {
-		if (estadoNuevo == null) {
-            throw new IllegalArgumentException("El estado nuevo no puede ser nulo.");
-        }
-		this.estadoActual = estadoNuevo;
+
+	    if (estadoNuevo == null) {
+	        throw new IllegalArgumentException("El estado nuevo no puede ser nulo.");
+	    }
+
+	    this.estadoActual = estadoNuevo;
+	    this.notificarObservadores();
 	}
 	
 	public void agregarServicio(EntidadCatalogo item) {
@@ -215,6 +229,51 @@ public class Reserva {
 
 	void liberarCupos() {
 		this.items.stream().forEach(item -> item.liberarCupos(fechaInicio, fechaFin, cantidad));
+	}
+
+
+
+	public void seleccionarMetodoDePago(MetodoDePago metodoDePago) {
+    if (metodoDePago == null) {
+        throw new IllegalArgumentException("El método de pago no puede ser nulo.");
+    }
+
+    this.metodoDePago = metodoDePago;
+	}
+
+	public String pagar(double monto) {
+		if (this.metodoDePago == null) {
+			throw new IllegalStateException("No se seleccionó un método de pago.");
+    }
+
+		String codigo = this.metodoDePago.procesarPago(monto);
+
+		Comprobante comprobante = this.metodoDePago.crearComprobante(codigo);
+
+		this.registrarComprobante(comprobante);
+
+			return codigo;
+	}
+
+	public String getEmail() {
+		return this.email;
+	}
+	public void agregarObservador(ObservadorReserva observador) {
+	    if (observador == null) {
+	        throw new IllegalArgumentException("El observador no puede ser nulo.");
+	    }
+
+	    if (this.observadores.contains(observador)) {
+	        throw new IllegalArgumentException("El observador ya fue agregado.");
+	    }
+
+	    this.observadores.add(observador);
+	}
+
+	void notificarObservadores() {
+	    for (ObservadorReserva observador : this.observadores) {
+	        this.estadoActual.notificar(this, observador);
+	    }
 	}
 
 }

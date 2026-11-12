@@ -1,6 +1,7 @@
 package unqtravel.reservaYSusEstados;
 
 import unqtravel.catalogo.EntidadCatalogo;
+import unqtravel.notificaciones.ObservadorReserva;
 
 public class SolicitudPendiente extends EstadoReserva {
 	
@@ -26,5 +27,8 @@ public class SolicitudPendiente extends EstadoReserva {
 	void cancelarViaje(Reserva reserva) {
 		reserva.cambiarEstado(new Cancelada());
 	}
+	
+	@Override
+	void notificar(Reserva reserva, ObservadorReserva observador) {}
 	
 }

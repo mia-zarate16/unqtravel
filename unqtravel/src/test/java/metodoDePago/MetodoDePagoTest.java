@@ -3,6 +3,8 @@ package metodoDePago;
 
 import org.junit.jupiter.api.Test;
 
+import unqtravel.comprobantes.Comprobante;
+import unqtravel.comprobantes.VoucherPago;
 import unqtravel.metodoDePago.MetodoDePago;
 
 import java.util.ArrayList;
@@ -39,8 +41,12 @@ class MetodoDePagoTest {
                 pasos.add("notificar");
                 super.notificarResultado(codigo);
             }
-        };
 
+            @Override
+            public Comprobante crearComprobante(String codigo) {
+                return new VoucherPago(codigo);
+            }
+        };
         String resultado = metodo.procesarPago(15000.0);
 
         assertEquals(
