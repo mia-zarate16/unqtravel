@@ -1,6 +1,7 @@
 package unqtravel.reservaYSusEstados;
 
 import unqtravel.catalogo.EntidadCatalogo;
+import unqtravel.notificaciones.ObservadorReserva;
 
 public abstract class EstadoReserva {
 	
@@ -31,4 +32,6 @@ public abstract class EstadoReserva {
 	void cancelarViaje(Reserva reserva) {
 		throw new OperacionReservaInvalida("No se puede cancelar la reserva en el estado actual.");
 	}
+	
+	abstract void notificar(Reserva reserva, ObservadorReserva observador);
 }

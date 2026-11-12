@@ -1,4 +1,5 @@
 package unqtravel.reservaYSusEstados;
+import unqtravel.notificaciones.ObservadorReserva;
 
 import unqtravel.comprobantes.VoucherReembolso;
 
@@ -15,5 +16,8 @@ public class EnCurso extends EstadoReserva {
         reserva.registrarComprobante(voucher);
         reserva.cambiarEstado(new Cancelada());
     }
-    
+    @Override
+    void notificar(Reserva reserva, ObservadorReserva observador) {
+        observador.alIniciar(reserva);
+    }
 }

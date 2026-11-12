@@ -1,5 +1,10 @@
 package unqtravel.reservaYSusEstados;
 
-public class Finalizada extends EstadoReserva {
+import unqtravel.notificaciones.ObservadorReserva;
 
+public class Finalizada extends EstadoReserva {
+	@Override
+	void notificar(Reserva reserva, ObservadorReserva observador) {
+	    observador.alFinalizar(reserva);
+	}
 }
