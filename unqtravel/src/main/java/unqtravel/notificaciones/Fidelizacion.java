@@ -12,9 +12,9 @@ public class Fidelizacion implements ObservadorReserva {
         this.mailSender = mailSender;
     }
 
-    private void mandarCupon(String codigoCupon) {
+    private void mandarCupon(Reserva reserva, String codigoCupon) {
         mailSender.enviarMail(
-            "cliente@mail.com",
+            reserva.getEmail(),
             "Cupón de descuento",
             "Te ofrecemos un cupón del 5%: " + codigoCupon,
             null
@@ -24,15 +24,18 @@ public class Fidelizacion implements ObservadorReserva {
     @Override
     public void alCancelar(Reserva reserva) {
         String codigoCupon = cupon.generarCupon(reserva, 5);
-        mandarCupon(codigoCupon);
+        mandarCupon(reserva, codigoCupon);
     }
 
     @Override
-    public void alConfirmar(Reserva reserva) {}
+    public void alConfirmar(Reserva reserva) {
+    }
 
     @Override
-    public void alIniciar(Reserva reserva) {}
+    public void alIniciar(Reserva reserva) {
+    }
 
     @Override
-    public void alFinalizar(Reserva reserva) {}
+    public void alFinalizar(Reserva reserva) {
+    }
 }

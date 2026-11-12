@@ -1,4 +1,5 @@
 package unqtravel.metodoDePago;
+import unqtravel.comprobantes.Comprobante;
 
 
 public abstract class MetodoDePago {
@@ -29,5 +30,8 @@ public abstract class MetodoDePago {
     public String getCodigoTransaccion() {
         return codigoTransaccion;
     }
+    
+    public abstract Comprobante crearComprobante(String codigo);
+    
 }
  
