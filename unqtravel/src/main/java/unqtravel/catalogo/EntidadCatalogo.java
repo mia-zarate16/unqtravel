@@ -1,6 +1,7 @@
 package unqtravel.catalogo;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 public interface EntidadCatalogo {
 	public String getNombre();

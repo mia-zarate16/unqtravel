@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 
@@ -234,7 +235,7 @@ public class ServicioIndividualTest {
 	@Test
 	public void testGetCategoria() {
 	    // EXERCISE
-	    CategoriaServicio resultado = servicioHotel.getCategoria();
+	    Set<CategoriaServicio> resultado = servicioHotel.getCategoria();
 
 	    // VERIFY
 	    assertEquals(CategoriaServicio.ALOJAMIENTO, resultado);

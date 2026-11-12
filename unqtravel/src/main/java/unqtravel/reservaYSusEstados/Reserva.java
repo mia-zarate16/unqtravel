@@ -65,10 +65,6 @@ public class Reserva {
 	
 	
 	//										GETTERS
-	public String getId() {
-		return this.id;
-	}
-	
 	public LocalDate getFechaInicio() {
 		return this.fechaInicio;
 	}
