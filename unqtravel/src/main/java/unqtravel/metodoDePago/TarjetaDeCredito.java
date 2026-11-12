@@ -1,8 +1,9 @@
 package unqtravel.metodoDePago;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+
+import unqtravel.comprobantes.Comprobante;
+import unqtravel.comprobantes.VoucherPago;
+
 
 public class TarjetaDeCredito extends MetodoDePago {
 	 
@@ -19,26 +20,31 @@ public class TarjetaDeCredito extends MetodoDePago {
     }
  
     @Override
-    protected void validarDatos(double monto) {
+	public void validarDatos(double monto) {
         if (!api.validarTarjeta(numero, cvv, vencimiento)) {
             throw new PagoInvalidoException("Los datos de la tarjeta son invalidos");
         }
     }
  
     @Override
-    protected void reservarFondos(double monto) {
+    public void reservarFondos(double monto) {
         api.preautorizar(numero, monto); // pre-autorizacion al banco emisor
     }
  
     @Override
-    protected String ejecutarTransaccion(double monto) {
+    public String ejecutarTransaccion(double monto) {
         return api.cobrar(numero, monto);
     }
  
     @Override
-    protected void notificarResultado(String codigo) {
-        super.notificarResultado(codigo); // registrarlo
-        api.generarVoucher(codigo);       // generarlo
+    public void notificarResultado(String codigo) {
+        super.notificarResultado(codigo); 
+        api.generarVoucher(codigo);       
+    }
+    
+    @Override
+    public Comprobante crearComprobante(String codigo) {
+        return new VoucherPago(codigo);
     }
 }
  

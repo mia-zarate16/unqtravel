@@ -25,10 +25,12 @@ public class GestorDeReservas {
 	
 	
 	//										MÉTODOS DE RESERVA
-	public Reserva crearReserva(String id, LocalDate fechaInicio, LocalDate fechaFin, int cantidad, Direccion direccionDestino,
-			MetodoTraslado metodoDeTraslado, int cupoDeGuias) {
-		Reserva reserva = new Reserva(id, fechaInicio, fechaFin, cantidad,
-	            direccionDestino, metodoDeTraslado, cupoDeGuias,this.registroDeComprobantes);
+	public Reserva crearReserva(String id, LocalDate fechaInicio, LocalDate fechaFin, int cantidad,
+	        Direccion direccionDestino, MetodoTraslado metodoDeTraslado, int cupoDeGuias, String email) {
+
+	    Reserva reserva = new Reserva(id, fechaInicio, fechaFin, cantidad,
+	            direccionDestino, metodoDeTraslado, cupoDeGuias, this.registroDeComprobantes, email);
+
 	    registrarReserva(reserva);
 	    return reserva;
 	}

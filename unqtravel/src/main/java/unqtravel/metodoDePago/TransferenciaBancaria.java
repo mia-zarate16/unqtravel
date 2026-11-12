@@ -1,6 +1,9 @@
 package unqtravel.metodoDePago;
 
 import java.time.LocalDate;
+import unqtravel.comprobantes.Comprobante;
+import unqtravel.comprobantes.ComprobanteTransferencia;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,19 +29,19 @@ public class TransferenciaBancaria extends MetodoDePago {
     }
  
     @Override
-    protected void validarDatos(double monto) {
+	public void validarDatos(double monto) {
         if (!api.validarCuenta(clave, alias)) {
             throw new PagoInvalidoException("El CBU/CVU o el alias son invalidos");
         }
     }
  
     @Override
-    protected void reservarFondos(double monto) {
+    public void reservarFondos(double monto) {
         // No aplica: es una transferencia directa, no hay fondos que reservar.
     }
  
     @Override
-    protected String ejecutarTransaccion(double monto) {
+    public String ejecutarTransaccion(double monto) {
         if (esProgramada()) {
             return api.transferenciaProgramada(clave, monto, fechaProgramada);
         }
@@ -46,7 +49,7 @@ public class TransferenciaBancaria extends MetodoDePago {
     }
  
     @Override
-    protected void notificarResultado(String codigo) {
+    public void notificarResultado(String codigo) {
         super.notificarResultado(codigo); // registrarlo
         api.generarComprobante(codigo);   // generarlo
     }
@@ -54,5 +57,10 @@ public class TransferenciaBancaria extends MetodoDePago {
     // Se deduce de la fecha: asi nunca puede quedar inconsistente con ella.
     public boolean esProgramada() {
         return fechaProgramada != null;
+    }
+    
+    @Override
+    public Comprobante crearComprobante(String codigo) {
+        return new ComprobanteTransferencia(codigo, clave);
     }
 }

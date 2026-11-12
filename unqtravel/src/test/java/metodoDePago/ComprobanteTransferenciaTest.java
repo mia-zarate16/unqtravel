@@ -2,7 +2,7 @@ package metodoDePago;
 
 import org.junit.jupiter.api.Test;
 
-import unqtravel.metodoDePago.ComprobanteTransferencia;
+import unqtravel.comprobantes.ComprobanteTransferencia;
 
 import static org.junit.jupiter.api.Assertions.*;
 
