@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -237,8 +238,10 @@ public class ServicioIndividualTest {
 	    // EXERCISE
 	    Set<CategoriaServicio> resultado = servicioHotel.getCategoria();
 
+	    Set<CategoriaServicio> setCat = new HashSet<>(); setCat.add(CategoriaServicio.ALOJAMIENTO);
+	    
 	    // VERIFY
-	    assertEquals(CategoriaServicio.ALOJAMIENTO, resultado);
+	    assertEquals(setCat, resultado);
 	}
 	
 	@Test

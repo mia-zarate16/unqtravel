@@ -5,11 +5,11 @@ import unqtravel.notificaciones.ObservadorReserva;
 
 public abstract class EstadoReserva {
 	
-	void agregarServicio(Reserva reserva, EntidadCatalogo servicio) {
+	public void agregarServicio(Reserva reserva, EntidadCatalogo servicio) {
 		throw new OperacionReservaInvalida("No se puede agregar un servicio a la reserva en el estado actual.");
 	}
 	
-	void quitarServicio(Reserva reserva, EntidadCatalogo servicio) {
+	public void quitarServicio(Reserva reserva, EntidadCatalogo servicio) {
 		throw new OperacionReservaInvalida("No se puede quitar un servicio a la reserva en el estado actual.");
 	}
 	

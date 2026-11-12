@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import unqtravel.catalogo.EntidadCatalogo;
 import unqtravel.comprobantes.RegistroComprobante;
 import unqtravel.metodoDeTrasladoYTasas.MetodoTraslado;
 import unqtravel.reservaYSusEstados.Direccion;
@@ -26,6 +27,10 @@ class ReservaTest {
     private int cupoDeGuias;
     private RegistroComprobante registro;
     private String email;
+    
+    //DOC
+    private EntidadCatalogo item1;
+    private EntidadCatalogo item2;
 
     @BeforeEach
     void setUp() {
@@ -38,6 +43,8 @@ class ReservaTest {
         cupoDeGuias = 1;
         registro = new RegistroComprobante();
         email = "cliente@mail.com";
+        
+        item1 = mock(EntidadCatalogo.class);
 
         reserva = crearReservaValida();
     }
@@ -126,4 +133,16 @@ class ReservaTest {
 
         assertTrue(reserva.getItems().isEmpty());
     }
+   
+    @Test
+    void agregarYQuitarItemsEnEstadoPendiente() {
+    	reserva.getEstadoActual().agregarServicio(reserva,item1);
+    	assertFalse(reserva.getItems().isEmpty());
+    	assertThrows(IllegalArgumentException.class, () -> reserva.getEstadoActual().agregarServicio(reserva,item1));
+    	assertThrows(IllegalArgumentException.class, () -> reserva.getEstadoActual().agregarServicio(reserva,null));
+    	
+    	reserva.getEstadoActual().quitarServicio(reserva,item1);
+    	assertTrue(reserva.getItems().isEmpty());
+    }
+    
 }

@@ -4,8 +4,11 @@ import static org.mockito.Mockito.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Assertions.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import unqtravel.Busqueda.*;
 import unqtravel.catalogo.*;
@@ -26,6 +29,9 @@ public class CatalogoTestCase {
   private EntidadCatalogo e2;
   private EntidadCatalogo e3;
   private EntidadCatalogo e4;
+  private Set<CategoriaServicio> setCat1;
+  private Set<CategoriaServicio> setCat2;
+  private Set<CategoriaServicio> setCat3;
 	
   @BeforeEach
   void setUp() {
@@ -42,7 +48,7 @@ public class CatalogoTestCase {
 	
 	c1 = new CriterioNombre("Nombre Generico");
 	c2 = new CriterioCategoria(CategoriaServicio.ALOJAMIENTO);
-	c3 = new CriterioDisponibilidad();
+	c3 = new CriterioDisponibilidad(LocalDate.now(),LocalDate.of(2026, 12, 30),15);
 	c4 = new CriterioPrecio(5000.0);
 	
 	List<CriterioBusqueda> listaCA = new ArrayList<>(); listaCA.add(c2); listaCA.add(c3);
@@ -51,19 +57,28 @@ public class CatalogoTestCase {
 	cA = new CriterioAND(listaCA);
 	cO = new CriterioOR(listaCO);
 	cN = new CriterioNOT(c2);
+	setCat1 = new HashSet<>(); setCat1.add(CategoriaServicio.ALOJAMIENTO);
+	setCat2 = new HashSet<>(); setCat2.add(CategoriaServicio.EXCURSION);
+	setCat3 = new HashSet<>(); setCat3.add(CategoriaServicio.ALQUILERDEAUTO);
+	
 	
 	// Stubs
-	when(e1.getNombre()).thenReturn("Servicio Con Nombre Generico"); when(e1.getCategoria()).thenReturn("EXCURSION");
-	when(e1.getPrecioBase()).thenReturn(3500.0); when(e1.hayDisponibilidad()).thenReturn(false);
+	when(e1.getNombre()).thenReturn("Servicio Con Nombre Generico"); when(e1.getCategoria()).thenReturn(setCat2);
+	when(e1.getPrecioBase()).thenReturn(3500.0); 
+	when(e1.hayDisponibilidad(LocalDate.now(),LocalDate.of(2026, 12, 30),15)).thenReturn(false);
 	
-	when(e2.getNombre()).thenReturn("Otro servicio Con nomBre GeneRicO"); when(e2.getCategoria()).thenReturn("ALOJAMIENTO");
-	when(e2.getPrecioBase()).thenReturn(5400.0); when(e2.hayDisponibilidad()).thenReturn(true);
+	when(e2.getNombre()).thenReturn("Otro servicio Con nomBre GeneRicO"); when(e2.getCategoria()).thenReturn(setCat1);
+	when(e2.getPrecioBase()).thenReturn(5400.0); 
+	when(e2.hayDisponibilidad(LocalDate.now(),LocalDate.of(2026, 12, 30),15)).thenReturn(true);
 	
-	when(e3.getNombre()).thenReturn("Servicio Cualquiera"); when(e3.getCategoria()).thenReturn("ALOJAMIENTO");
-	when(e3.getPrecioBase()).thenReturn(2300.0); when(e3.hayDisponibilidad()).thenReturn(false);
+	when(e3.getNombre()).thenReturn("Servicio Cualquiera"); 
+	when(e3.getCategoria()).thenReturn(setCat1);
+	when(e3.getPrecioBase()).thenReturn(2300.0); 
+	when(e3.hayDisponibilidad(LocalDate.now(),LocalDate.of(2026, 12, 30),15)).thenReturn(false);
 	
-	when(e4.getNombre()).thenReturn("Servicio Con algun nombre"); when(e4.getCategoria()).thenReturn("ALQUILERDEAUTO");
-	when(e4.getPrecioBase()).thenReturn(6780.0); when(e4.hayDisponibilidad()).thenReturn(true);
+	when(e4.getNombre()).thenReturn("Servicio Con algun nombre"); when(e4.getCategoria()).thenReturn(setCat3);
+	when(e4.getPrecioBase()).thenReturn(6780.0); 
+	when(e4.hayDisponibilidad(LocalDate.now(),LocalDate.of(2026, 12, 30),15)).thenReturn(true);
   }
 	
   @Test
