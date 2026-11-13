@@ -134,6 +134,18 @@ public class PaqueteTuristico implements EntidadCatalogo{
 	public void liberarCupos(LocalDate fechaInicio, LocalDate fechaFin, int cantidad) {
 		    items.forEach(item -> item.liberarCupos(fechaInicio, fechaFin, cantidad));
 	}
+
+
+	@Override
+	public Set<ServicioIndividual> obtenerServiciosIndividuales() {
+      Set<ServicioIndividual> servicios = new HashSet<>();
+      
+        for (EntidadCatalogo item : items) {
+	      servicios.addAll(item.obtenerServiciosIndividuales());
+	    }
+        
+	    return servicios;
+	}
 	
 	
 }

@@ -55,4 +55,16 @@ public class GestorDeReservas {
 	public List<Reserva> obtenerReservas() {
         return new ArrayList<>(this.reservas);
     }
+	
+	public List<Reserva> buscarReservasPorPeriodo(
+		    LocalDate fechaInicio,
+		    LocalDate fechaFin
+		) {
+		    return this.reservas.stream()
+		        .filter(reserva ->
+		            !reserva.getFechaDeReserva().isBefore(fechaInicio) &&
+		            !reserva.getFechaDeReserva().isAfter(fechaFin)
+		        )
+		        .toList();
+		}
 }

@@ -11,6 +11,7 @@ public interface EntidadCatalogo {
 	public double getDescuento();
 	Set<CategoriaServicio> getCategoria();
 	public boolean esValido();
+	public Set<ServicioIndividual> obtenerServiciosIndividuales();
 	boolean hayDisponibilidad(LocalDate fechaInicio, LocalDate fechaFin, int cantidad);
 	boolean ocuparCupos(LocalDate fechaInicio, LocalDate fechaFin, int cantidad);
 	void liberarCupos(LocalDate fechaInicio, LocalDate fechaFin, int cantidad);

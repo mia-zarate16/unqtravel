@@ -6,6 +6,9 @@ import unqtravel.notificaciones.ObservadorReserva;
 public class SolicitudPendiente extends EstadoReserva {
 	
 	@Override
+	public boolean esVentaEfectiva() { return false; }
+	
+	@Override
 	public void agregarServicio(Reserva reserva, EntidadCatalogo item) {
 		reserva.agregarItem(item);
 	}

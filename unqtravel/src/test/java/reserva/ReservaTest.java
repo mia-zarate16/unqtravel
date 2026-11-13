@@ -143,6 +143,8 @@ class ReservaTest {
     	
     	reserva.getEstadoActual().quitarServicio(reserva,item1);
     	assertTrue(reserva.getItems().isEmpty());
+    	assertThrows(IllegalArgumentException.class, () -> reserva.getEstadoActual().quitarServicio(reserva,item1));
+    	assertThrows(IllegalArgumentException.class, () -> reserva.getEstadoActual().quitarServicio(reserva,null));
     }
     
 }

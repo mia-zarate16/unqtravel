@@ -141,6 +141,10 @@ public class ServicioIndividual implements EntidadCatalogo{
 	    a.asignarValor(valor);
 	}
 	
+	public Integer cuposOcupados(LocalDate fecha) {
+	  return ocupados.getOrDefault(fecha,0);
+	}
+	
 	
 	//										MÉTODOS DE CUPOS
 	public boolean hayDisponibilidad(LocalDate fechaInicio,  LocalDate fechaFin, int cantidad) {
@@ -193,5 +197,11 @@ public class ServicioIndividual implements EntidadCatalogo{
 	            ocupados.put(fecha, nuevaCantidad);
 	        }
 	    }
+	}
+
+
+	@Override
+	public Set<ServicioIndividual> obtenerServiciosIndividuales() {
+	  return Set.of(this);
 	}
 }
