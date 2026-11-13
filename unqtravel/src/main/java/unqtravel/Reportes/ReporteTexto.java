@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import unqtravel.catalogo.EntidadCatalogo;
+import unqtravel.catalogo.Proveedor;
 
 public class ReporteTexto implements VisitorReporte {
 
@@ -60,8 +61,39 @@ public class ReporteTexto implements VisitorReporte {
 	}
 	@Override
 	public String visitar(ReporteExposicion reporte) {
-		// TODO Auto-generated method stub
-		return null;
+	    StringBuilder texto = new StringBuilder();
+
+	    texto.append("REPORTE DE EXPOSICIÓN POR PROVEEDOR / OPERADOR\n\n");
+
+	    texto.append("Cantidad total de servicios: ")
+	         .append(reporte.getCantidadTotalServicios())
+	         .append("\n\n");
+
+	    agregarExposicion(texto, reporte.getCantidadPorProveedor(),reporte.getCantidadTotalServicios());
+
+	    return texto.toString();
+	}
+	
+	private void agregarExposicion(StringBuilder texto,Map<Proveedor, Integer> cantidadPorProveedor,int cantidadTotalServicios) {
+	    for (Map.Entry<Proveedor, Integer> entrada : cantidadPorProveedor.entrySet()) {
+
+	        Proveedor proveedor = entrada.getKey();
+	        int cantidad = entrada.getValue();
+
+	        double porcentaje = cantidadTotalServicios == 0 ? 0 : (double) cantidad / cantidadTotalServicios * 100;
+
+	        texto.append("Proveedor: ")
+	             .append(proveedor.getNombre())
+	             .append("\n");
+
+	        texto.append("Servicios asociados: ")
+	             .append(cantidad)
+	             .append("\n");
+
+	        texto.append("Exposición: ")
+	             .append(String.format("%.2f", porcentaje))
+	             .append("%\n\n");
+	    }
 	}
 	
 	private void agregarOcupaciones(StringBuilder texto,String categoria,List<OcupacionServicio> ocupaciones) {

@@ -2,7 +2,6 @@ package unqtravel.Reportes;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import unqtravel.catalogo.CategoriaServicio;
@@ -43,6 +42,7 @@ public class ReporteOcupacionYCupo implements Reporte {
 	}
 
 	public ReporteOcupacionYCupo(LocalDate fechaInicio, LocalDate fechaFin, List<ServicioIndividual> servicios) {
+	  this.servicios = servicios;
       this.fechaInicio = fechaInicio;
       this.fechaFin = fechaFin;
       this.ocupacionesAlojamiento = crearOcupaciones(filtrarPorCategoria(CategoriaServicio.ALOJAMIENTO));
@@ -74,8 +74,8 @@ public class ReporteOcupacionYCupo implements Reporte {
     }
     
 	@Override
-	public String aceptar(VisitorReporte visitor) {
-		return visitor.visitar(this);
+	public String aceptar(VisitorReporte visitante) {
+		return visitante.visitar(this);
 	}
 
 }

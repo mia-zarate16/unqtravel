@@ -37,9 +37,9 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Mockito/byte-buddy-1.15.7.jar"/>
-	<classpathentry kind="lib" path="C:/Mockito/mockito-core-5.14.2.jar"/>
-	<classpathentry kind="lib" path="C:/Mockito/net.bytebuddy.byte-buddy-agent_1.15.7.jar"/>
 	<classpathentry kind="lib" path="C:/Mockito/objenesis-3.3.jar"/>
+	<classpathentry kind="lib" path="C:/Mockito/byte-buddy-1.17.7.jar"/>
+	<classpathentry kind="lib" path="C:/Mockito/byte-buddy-agent-1.17.7.jar"/>
+	<classpathentry kind="lib" path="C:/Mockito/mockito-core-5.22.0.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
