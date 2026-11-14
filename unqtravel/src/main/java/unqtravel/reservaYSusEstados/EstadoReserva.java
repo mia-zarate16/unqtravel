@@ -7,11 +7,11 @@ public abstract class EstadoReserva {
 	
 	public boolean esVentaEfectiva() { return true; }
 	
-	public void agregarServicio(Reserva reserva, EntidadCatalogo servicio) {
+	void agregarServicio(Reserva reserva, EntidadCatalogo servicio) {
 		throw new OperacionReservaInvalida("No se puede agregar un servicio a la reserva en el estado actual.");
 	}
 	
-	public void quitarServicio(Reserva reserva, EntidadCatalogo servicio) {
+	void quitarServicio(Reserva reserva, EntidadCatalogo servicio) {
 		throw new OperacionReservaInvalida("No se puede quitar un servicio a la reserva en el estado actual.");
 	}
 	

@@ -6,6 +6,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -68,6 +70,55 @@ public class PaqueteTuristicoTest {
 	    
 	    verify(hotel).esValido();
 	    verify(traslado).esValido();
+	}
+	
+	@Test
+	void testHayDisponibilidadConTodosLosItemsDisponibles() {
+	    // SETUP
+	    LocalDate inicio = LocalDate.of(2026, 12, 1);
+	    LocalDate fin = LocalDate.of(2026, 12, 5);
+
+	    when(hotel.hayDisponibilidad(inicio, fin, 2)).thenReturn(true);
+	    when(excursion.hayDisponibilidad(inicio, fin, 2)).thenReturn(true);
+
+	    paqueteV1.agregarItem(hotel);
+	    paqueteV1.agregarItem(excursion);
+
+	    // VERIFY
+	    assertTrue(paqueteV1.hayDisponibilidad(inicio, fin, 2));
+
+	    verify(hotel).hayDisponibilidad(inicio, fin, 2);
+	    verify(excursion).hayDisponibilidad(inicio, fin, 2);
+	}
+
+	@Test
+	void testHayDisponibilidadConAlgunItemSinDisponibilidad() {
+	    // SETUP
+	    LocalDate inicio = LocalDate.of(2026, 12, 1);
+	    LocalDate fin = LocalDate.of(2026, 12, 5);
+
+	    when(hotel.hayDisponibilidad(inicio, fin, 2)).thenReturn(true);
+	    when(excursion.hayDisponibilidad(inicio, fin, 2)).thenReturn(false);
+
+	    paqueteV1.agregarItem(hotel);
+	    paqueteV1.agregarItem(excursion);
+	    
+	    // VERIFY
+	    assertFalse(paqueteV1.hayDisponibilidad(inicio, fin, 2));
+
+	    verify(hotel).hayDisponibilidad(inicio, fin, 2);
+	    verify(excursion).hayDisponibilidad(inicio, fin, 2);
+	}
+
+	@Test
+	void testHayDisponibilidadEnPaqueteSinItems() {
+	    // VERIFY
+	    assertTrue(paqueteV1.hayDisponibilidad(LocalDate.of(2026, 12, 1),LocalDate.of(2026, 12, 5),2));
+	}
+	
+	@Test
+	void testCategoriasCorrectas() {
+		
 	}
 	
 	@Test

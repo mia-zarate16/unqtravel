@@ -7,7 +7,7 @@ public abstract class MetodoDePago {
     private String codigoTransaccion;
  
 
-    public final String procesarPago(double monto) {
+    public String procesarPago(double monto) {
         validarDatos(monto);
         reservarFondos(monto);
         String codigo = ejecutarTransaccion(monto);

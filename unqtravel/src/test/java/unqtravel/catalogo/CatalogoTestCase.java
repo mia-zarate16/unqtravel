@@ -1,8 +1,9 @@
 package unqtravel.catalogo;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import static org.mockito.Mockito.*;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -11,7 +12,6 @@ import java.util.List;
 import java.util.Set;
 
 import unqtravel.Busqueda.*;
-import unqtravel.catalogo.*;
 
 public class CatalogoTestCase {
   //SUT
@@ -25,10 +25,10 @@ public class CatalogoTestCase {
   private CriterioNOT cN;
   
   //DOC
-  private EntidadCatalogo e1;
-  private EntidadCatalogo e2;
-  private EntidadCatalogo e3;
-  private EntidadCatalogo e4;
+  private ServicioIndividual e1;
+  private ServicioIndividual e2;
+  private ServicioIndividual e3;
+  private ServicioIndividual e4;
   private Set<CategoriaServicio> setCat1;
   private Set<CategoriaServicio> setCat2;
   private Set<CategoriaServicio> setCat3;
@@ -36,10 +36,10 @@ public class CatalogoTestCase {
   @BeforeEach
   void setUp() {
 	//DOC
-	e1 = mock(EntidadCatalogo.class);
-	e2 = mock(EntidadCatalogo.class);
-	e3 = mock(EntidadCatalogo.class);
-	e4 = mock(EntidadCatalogo.class);
+	e1 = mock(ServicioIndividual.class);
+	e2 = mock(ServicioIndividual.class);
+	e3 = mock(ServicioIndividual.class);
+	e4 = mock(ServicioIndividual.class);
 	  
 	//SUT
 	catTest = new Catalogo();
@@ -112,5 +112,32 @@ public class CatalogoTestCase {
 	
 	Assertions.assertTrue(filt3.contains(e1)); Assertions.assertTrue(filt3.contains(e4)); 
 	Assertions.assertFalse(filt3.contains(e2)); Assertions.assertFalse(filt3.contains(e3));
+  }
+  
+  @Test
+  void testTodosLosServiciosIndividuales() {
+	  when(e1.obtenerServiciosIndividuales()).thenReturn(Set.of(e1));
+	  when(e2.obtenerServiciosIndividuales()).thenReturn(Set.of(e2));
+	  when(e3.obtenerServiciosIndividuales()).thenReturn(Set.of(e3));
+	  when(e4.obtenerServiciosIndividuales()).thenReturn(Set.of(e4));
+	  
+	  Set<ServicioIndividual> serviciosIndividuales = catTest.todosLosServicios();
+	  
+	  assertTrue(serviciosIndividuales.contains(e1)); assertTrue(serviciosIndividuales.contains(e2));
+	  assertTrue(serviciosIndividuales.contains(e3)); assertTrue(serviciosIndividuales.contains(e4));
+  }
+  
+  @Test
+  void testServiciosFiltrados() {
+	  when(e1.obtenerServiciosIndividuales()).thenReturn(Set.of(e1));
+	  when(e2.obtenerServiciosIndividuales()).thenReturn(Set.of(e2));
+	  when(e3.obtenerServiciosIndividuales()).thenReturn(Set.of(e3));
+	  when(e4.obtenerServiciosIndividuales()).thenReturn(Set.of(e4));
+	  
+	  assertTrue(catTest.obtenerServiciosPorCategoria(CategoriaServicio.ALOJAMIENTO).contains(e2));
+	  assertTrue(catTest.obtenerServiciosPorCategoria(CategoriaServicio.ALOJAMIENTO).contains(e3));
+	  assertTrue(catTest.obtenerServiciosPorCategoria(CategoriaServicio.EXCURSION).contains(e1));
+	  assertTrue(catTest.obtenerServiciosPorCategoria(CategoriaServicio.ALQUILERDEAUTO).contains(e4));
+	  assertTrue(catTest.obtenerServiciosPorCategoria(CategoriaServicio.VUELO).isEmpty());
   }
 }

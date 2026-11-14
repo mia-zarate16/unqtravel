@@ -1,6 +1,7 @@
 package reserva;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
@@ -10,10 +11,11 @@ import org.junit.jupiter.api.Test;
 
 import unqtravel.catalogo.EntidadCatalogo;
 import unqtravel.comprobantes.RegistroComprobante;
+import unqtravel.comprobantes.VoucherReembolso;
+import unqtravel.metodoDePago.MetodoDePago;
 import unqtravel.metodoDeTrasladoYTasas.MetodoTraslado;
-import unqtravel.reservaYSusEstados.Direccion;
-import unqtravel.reservaYSusEstados.Reserva;
-import unqtravel.reservaYSusEstados.SolicitudPendiente;
+import unqtravel.notificaciones.ObservadorReserva;
+import unqtravel.reservaYSusEstados.*;
 
 class ReservaTest {
 
@@ -30,7 +32,7 @@ class ReservaTest {
     
     //DOC
     private EntidadCatalogo item1;
-    private EntidadCatalogo item2;
+    private ObservadorReserva observador;
 
     @BeforeEach
     void setUp() {
@@ -41,10 +43,14 @@ class ReservaTest {
         direccion = new Direccion();
         metodoTraslado = mock(MetodoTraslado.class);
         cupoDeGuias = 1;
-        registro = new RegistroComprobante();
+        registro = mock(RegistroComprobante.class);
         email = "cliente@mail.com";
         
         item1 = mock(EntidadCatalogo.class);
+        observador = mock(ObservadorReserva.class);
+        
+        when(item1.hayDisponibilidad(fechaInicio, fechaFin, cantidad)).thenReturn(true);
+        when(item1.ocuparCupos(fechaInicio, fechaFin, cantidad)).thenReturn(true);
 
         reserva = crearReservaValida();
     }
@@ -72,7 +78,7 @@ class ReservaTest {
 
     @Test
     void inicializaLaReservaEnEstadoSolicitudPendiente() {
-        assertEquals("SolicitudPendiente", reserva.getEstadoActual().getClass().getSimpleName());
+        assertInstanceOf(SolicitudPendiente.class, reserva.getEstadoActual());
     }
 
     @Test
@@ -133,18 +139,213 @@ class ReservaTest {
 
         assertTrue(reserva.getItems().isEmpty());
     }
+    
+    @Test
+    void calculaPrecioTotalDeLosItems() {
+        EntidadCatalogo item2 = mock(EntidadCatalogo.class);
+
+        when(item1.precioFinal()).thenReturn(100.0);
+        when(item2.precioFinal()).thenReturn(250.0);
+
+        reserva.agregarServicio(item1);
+        reserva.agregarServicio(item2);
+
+        assertEquals(350.0f, reserva.precioTotal(), 0.01f);
+    }
+
+    @Test
+    void calculaPrecioTotalDeUnaReservaSinItems() {
+        assertEquals(0.0f, reserva.precioTotal(), 0.01f);
+    }
+    
+    @Test
+    void calculaCostoDelTraslado() {
+        when(metodoTraslado.calcularCosto(reserva)).thenReturn(50.0f);
+
+        assertEquals(50.0f, reserva.costoDelTraslado(), 0.01f);
+    }
+    
+    @Test
+    void seleccionaMetodoDePagoValido() {
+        MetodoDePago metodo = mock(MetodoDePago.class);
+
+        assertDoesNotThrow(() -> reserva.seleccionarMetodoDePago(metodo));
+    }
+
+    @Test
+    void noPermiteSeleccionarMetodoDePagoNulo() {
+        assertThrows(IllegalArgumentException.class, () -> reserva.seleccionarMetodoDePago(null));
+    }
+    
+    @Test
+    void noPermiteAgregarObservadorNulo() {
+        assertThrows(IllegalArgumentException.class, () -> reserva.agregarObservador(null));
+    }
+
+    @Test
+    void noPermiteAgregarDosVecesElMismoObservador() {
+        reserva.agregarObservador(observador);
+
+        assertThrows(IllegalArgumentException.class,() -> reserva.agregarObservador(observador));
+    }
    
     @Test
     void agregarYQuitarItemsEnEstadoPendiente() {
-    	reserva.getEstadoActual().agregarServicio(reserva,item1);
+    	reserva.agregarServicio(item1);
     	assertFalse(reserva.getItems().isEmpty());
-    	assertThrows(IllegalArgumentException.class, () -> reserva.getEstadoActual().agregarServicio(reserva,item1));
-    	assertThrows(IllegalArgumentException.class, () -> reserva.getEstadoActual().agregarServicio(reserva,null));
+    	assertThrows(IllegalArgumentException.class, () -> reserva.agregarServicio(item1));
+    	assertThrows(IllegalArgumentException.class, () -> reserva.agregarServicio(null));
     	
-    	reserva.getEstadoActual().quitarServicio(reserva,item1);
+    	reserva.quitarServicio(item1);
     	assertTrue(reserva.getItems().isEmpty());
-    	assertThrows(IllegalArgumentException.class, () -> reserva.getEstadoActual().quitarServicio(reserva,item1));
-    	assertThrows(IllegalArgumentException.class, () -> reserva.getEstadoActual().quitarServicio(reserva,null));
+    	assertThrows(IllegalArgumentException.class, () -> reserva.quitarServicio(item1));
+    	assertThrows(IllegalArgumentException.class, () -> reserva.quitarServicio(null));
     }
     
+    @Test
+    void verificarVentaDeCupos() {
+    	when(item1.hayDisponibilidad(fechaInicio, fechaFin, cantidad)).thenReturn(false);
+    	assertThrows(OperacionReservaInvalida.class, () -> reserva.confirmarViaje());
+    	
+    	reserva.agregarServicio(item1);
+    	assertThrows(OperacionReservaInvalida.class, () -> reserva.confirmarViaje());
+    	
+    	when(item1.hayDisponibilidad(fechaInicio, fechaFin, cantidad)).thenReturn(true);
+    	when(item1.ocuparCupos(fechaInicio, fechaFin, cantidad)).thenReturn(false);
+    	assertThrows(OperacionReservaInvalida.class, () -> reserva.confirmarViaje());
+    	
+    	when(item1.ocuparCupos(fechaInicio, fechaFin, cantidad)).thenReturn(true);
+    	reserva.confirmarViaje();
+    	assertInstanceOf(Confirmada.class, reserva.getEstadoActual());
+    }
+    
+    @Test
+    void verificarCancelacionDesdePendiente() {
+    	reserva.cancelarViaje();
+    	assertInstanceOf(Cancelada.class,reserva.getEstadoActual());
+    }
+    
+    @Test
+    void noPermiteRealizarCheckinEnEstadoPendiente() {
+        assertThrows(OperacionReservaInvalida.class, () -> reserva.realizarCheckin());
+        assertThrows(OperacionReservaInvalida.class, () -> reserva.iniciarViaje());
+        assertThrows(OperacionReservaInvalida.class, () -> reserva.finalizarViaje());
+    }
+    
+    @Test
+    void noPermiteModificarItemsEnEstadoConfirmada() {
+        reserva.agregarServicio(item1);
+        reserva.confirmarViaje();
+
+        assertThrows(OperacionReservaInvalida.class, () -> reserva.agregarServicio(mock(EntidadCatalogo.class)));
+        assertThrows(OperacionReservaInvalida.class, () -> reserva.quitarServicio(item1));
+    }
+    
+    @Test
+    void notificaObservadoresAlConfirmarReserva() {
+        reserva.agregarObservador(observador);
+
+        reserva.agregarServicio(item1);
+        reserva.confirmarViaje();
+
+        verify(observador).alConfirmar(reserva);
+    }
+    
+    @Test
+    void verificarCancelacionDesdeConfirmada( ) {
+    	reserva.agregarServicio(item1); reserva.confirmarViaje();
+    	assertInstanceOf(Confirmada.class, reserva.getEstadoActual());
+    	
+    	reserva.cancelarViaje();
+    	assertInstanceOf(Cancelada.class, reserva.getEstadoActual());
+    }
+    
+    @Test
+    void calculaImporteReembolsableEnCheckIn() {
+        when(item1.precioFinal()).thenReturn(100.0);
+        when(metodoTraslado.calcularCosto(reserva)).thenReturn(50.0f);
+
+        reserva.agregarServicio(item1);
+
+        assertEquals(150.0f, reserva.importeReembolsableEnCheckIn(), 0.01f);
+    }
+    
+    @Test
+    void verificarRegistroDeComprobanteAlCancelarDesdeCheckIn() {
+    	when(metodoTraslado.calcularCosto(reserva)).thenReturn(100.0f);
+    	
+        reserva.agregarServicio(item1);
+        reserva.confirmarViaje();
+        reserva.realizarCheckin();
+
+        reserva.cancelarViaje();
+
+        verify(registro, times(1)).registrarComprobante(any(VoucherReembolso.class));
+        verify(item1).liberarCupos(fechaInicio, fechaFin, cantidad);
+    }
+    
+    @Test
+    void notificaAlIniciarViaje() {
+        reserva.agregarObservador(observador);
+
+        reserva.agregarServicio(item1);
+        reserva.confirmarViaje();
+        reserva.realizarCheckin();
+        reserva.iniciarViaje();
+
+        verify(observador).alIniciar(reserva);
+    }
+    
+    @Test
+    void verificarCancelacionDesdeEnCurso() {
+        reserva.agregarServicio(item1);
+        reserva.confirmarViaje();
+        reserva.realizarCheckin();
+        reserva.iniciarViaje();
+
+        assertInstanceOf(EnCurso.class, reserva.getEstadoActual());
+
+        reserva.cancelarViaje();
+
+        assertInstanceOf(Cancelada.class, reserva.getEstadoActual());
+    }
+    
+    @Test
+    void verificarRegistroDeComprobanteAlCancelarDesdeEnCurso() {
+        reserva.agregarServicio(item1);
+        reserva.confirmarViaje();
+        reserva.realizarCheckin();
+        reserva.iniciarViaje();
+
+        reserva.cancelarViaje();
+        
+        verify(item1, never()).liberarCupos(fechaInicio, fechaFin, cantidad);
+    }
+    
+    @Test
+    void notificaAlFinalizarViaje() {
+        reserva.agregarObservador(observador);
+
+        reserva.agregarServicio(item1);
+        reserva.confirmarViaje();
+        reserva.realizarCheckin();
+        reserva.iniciarViaje();
+        reserva.finalizarViaje();
+
+        verify(observador).alFinalizar(reserva);
+    }
+    
+    @Test
+    void notificaAlCancelarReserva() {
+        reserva.agregarObservador(observador);
+
+        reserva.cancelarViaje();
+
+        verify(observador).alCancelar(reserva);
+    }
+    
+    @Test
+    void verificarVentasEfectivas() {
+    	assertFalse(reserva.esVentaEfectiva());
+    }
 }
