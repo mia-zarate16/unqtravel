@@ -6,7 +6,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 
@@ -34,45 +37,173 @@ public class PaqueteTuristicoTest {
 	
 	@Test
 	public void testPaqueteConTodosSusItemsValidos() {
-	    //SETUP
 	    when(hotel.esValido()).thenReturn(true);
 	    when(excursion.esValido()).thenReturn(true);
 
 	    paqueteV1.agregarItem(hotel);
 	    paqueteV1.agregarItem(excursion);
 
-	    //EXERCISE
-	    boolean resultado = paqueteV1.esValido();
-
-	    //VERIFY
-	    assertTrue(resultado);
+	    assertTrue(paqueteV1.esValido());
 	    
 	    verify(hotel).esValido();
 	    verify(excursion).esValido();
-	}
-	
-	@Test
-	public void testPaqueteConAlgunoDeSusItemsInvalido() {
-		//SETUP
-		when(hotel.esValido()).thenReturn(true);
+
 	    when(traslado.esValido()).thenReturn(false);
 	    
-	    paqueteV2.agregarItem(hotel);
-	    paqueteV2.agregarItem(traslado);
+	    paqueteV1.agregarItem(traslado);
 	    
-	    //EXERCISE
-	    boolean resultado = paqueteV2.esValido();
+	    assertFalse(paqueteV1.esValido());
 	    
-	    //VERIFY
-	    assertFalse(resultado);
-	    
-	    verify(hotel).esValido();
 	    verify(traslado).esValido();
 	}
 	
 	@Test
+	void testHayDisponibilidadConTodosLosItemsDisponibles() {
+	    LocalDate inicio = LocalDate.of(2026, 12, 1);
+	    LocalDate fin = LocalDate.of(2026, 12, 5);
+
+	    when(hotel.hayDisponibilidad(inicio, fin, 2)).thenReturn(true);
+	    when(excursion.hayDisponibilidad(inicio, fin, 2)).thenReturn(true);
+
+	    paqueteV1.agregarItem(hotel);
+	    paqueteV1.agregarItem(excursion);
+
+	    assertTrue(paqueteV1.hayDisponibilidad(inicio, fin, 2));
+
+	    verify(hotel).hayDisponibilidad(inicio, fin, 2);
+	    verify(excursion).hayDisponibilidad(inicio, fin, 2);
+	}
+
+	@Test
+	void testHayDisponibilidadConAlgunItemSinDisponibilidad() {
+	    LocalDate inicio = LocalDate.of(2026, 12, 1);
+	    LocalDate fin = LocalDate.of(2026, 12, 5);
+
+	    when(hotel.hayDisponibilidad(inicio, fin, 2)).thenReturn(true);
+	    when(excursion.hayDisponibilidad(inicio, fin, 2)).thenReturn(false);
+
+	    paqueteV1.agregarItem(hotel);
+	    paqueteV1.agregarItem(excursion);
+	    
+	    assertFalse(paqueteV1.hayDisponibilidad(inicio, fin, 2));
+
+	    verify(hotel).hayDisponibilidad(inicio, fin, 2);
+	    verify(excursion).hayDisponibilidad(inicio, fin, 2);
+	}
+
+	@Test
+	void testHayDisponibilidadEnPaqueteSinItems() {
+	    assertTrue(paqueteV1.hayDisponibilidad(LocalDate.of(2026, 12, 1),LocalDate.of(2026, 12, 5),2));
+	}
+	
+	@Test
+	void testGetCategoria() {
+	    when(hotel.getCategoria()).thenReturn(Set.of(CategoriaServicio.ALOJAMIENTO));
+	    when(excursion.getCategoria()).thenReturn(Set.of(CategoriaServicio.EXCURSION));
+	    when(traslado.getCategoria()).thenReturn(Set.of(CategoriaServicio.ALOJAMIENTO));
+
+	    paqueteV1.agregarItem(hotel);
+	    paqueteV1.agregarItem(excursion);
+	    paqueteV1.agregarItem(traslado);
+
+	    Set<CategoriaServicio> categorias = paqueteV1.getCategoria();
+
+	    assertEquals(2, categorias.size());
+	    assertTrue(categorias.contains(CategoriaServicio.ALOJAMIENTO));
+	    assertTrue(categorias.contains(CategoriaServicio.EXCURSION));
+	}
+	
+	@Test
+	void testGetCategoriaPaqueteVacio() {
+	    assertTrue(paqueteV1.getCategoria().isEmpty());
+	}
+	
+	@Test
+	void testOcuparCuposCorrectamente() {
+	    LocalDate inicio = LocalDate.of(2026, 12, 1);
+	    LocalDate fin = LocalDate.of(2026, 12, 5);
+	    int cantidad = 2;
+
+	    when(hotel.hayDisponibilidad(inicio, fin, cantidad)).thenReturn(true);
+	    when(excursion.hayDisponibilidad(inicio, fin, cantidad)).thenReturn(true);
+
+	    when(hotel.ocuparCupos(inicio, fin, cantidad)).thenReturn(true);
+	    when(excursion.ocuparCupos(inicio, fin, cantidad)).thenReturn(true);
+
+	    paqueteV1.agregarItem(hotel);
+	    paqueteV1.agregarItem(excursion);
+
+	    assertTrue(paqueteV1.ocuparCupos(inicio, fin, cantidad));
+
+	    verify(hotel).ocuparCupos(inicio, fin, cantidad);
+	    verify(excursion).ocuparCupos(inicio, fin, cantidad);
+	}
+	
+	@Test
+	void testOcuparCuposSinDisponibilidad() {
+	    LocalDate inicio = LocalDate.of(2026, 12, 1);
+	    LocalDate fin = LocalDate.of(2026, 12, 5);
+	    int cantidad = 2;
+
+	    when(hotel.hayDisponibilidad(inicio, fin, cantidad)).thenReturn(false);
+
+	    paqueteV1.agregarItem(hotel);
+	    paqueteV1.agregarItem(excursion);
+
+	    assertFalse(paqueteV1.ocuparCupos(inicio, fin, cantidad));
+
+	    verify(hotel, never()).ocuparCupos(inicio, fin, cantidad);
+	    verify(excursion, never()).ocuparCupos(inicio, fin, cantidad);
+	}
+	
+	@Test
+	void testOcuparCuposFallaYLiberaLosAnteriores() {
+	    LocalDate inicio = LocalDate.of(2026, 12, 1);
+	    LocalDate fin = LocalDate.of(2026, 12, 5);
+	    int cantidad = 2;
+
+	    when(hotel.hayDisponibilidad(inicio, fin, cantidad)).thenReturn(true);
+	    when(excursion.hayDisponibilidad(inicio, fin, cantidad)).thenReturn(true);
+
+	    when(hotel.ocuparCupos(inicio, fin, cantidad)).thenReturn(true);
+	    when(excursion.ocuparCupos(inicio, fin, cantidad)).thenReturn(false);
+
+	    paqueteV1.agregarItem(hotel);
+	    paqueteV1.agregarItem(excursion);
+
+	    assertFalse(paqueteV1.ocuparCupos(inicio, fin, cantidad));
+
+	    verify(hotel).liberarCupos(inicio, fin, cantidad);
+	    verify(excursion, never()).liberarCupos(inicio, fin, cantidad);
+	}
+	
+	@Test
+	void testOcuparCuposPaqueteVacio() {
+	    assertTrue(paqueteV1.ocuparCupos(LocalDate.of(2026, 12, 1), LocalDate.of(2026, 12, 5), 2));
+	}
+	
+	@Test
+	void testLiberarCupos() {
+	    LocalDate inicio = LocalDate.of(2026, 12, 1);
+	    LocalDate fin = LocalDate.of(2026, 12, 5);
+	    int cantidad = 2;
+
+	    paqueteV1.agregarItem(hotel);
+	    paqueteV1.agregarItem(excursion);
+
+	    paqueteV1.liberarCupos(inicio, fin, cantidad);
+
+	    verify(hotel).liberarCupos(inicio, fin, cantidad);
+	    verify(excursion).liberarCupos(inicio, fin, cantidad);
+	}
+	
+	@Test
+	void testLiberarCuposPaqueteVacio() {
+	    assertDoesNotThrow(() -> paqueteV1.liberarCupos(LocalDate.of(2026, 12, 1), LocalDate.of(2026, 12, 5), 2));
+	}
+	
+	@Test
 	public void testPaqueteConTodosSusItemsInvalidos() {
-	    //SETUP
 	    when(hotel.esValido()).thenReturn(false);
 	    when(excursion.esValido()).thenReturn(false);
 	    when(traslado.esValido()).thenReturn(false);
@@ -81,10 +212,8 @@ public class PaqueteTuristicoTest {
 	    paqueteV1.agregarItem(excursion);
 	    paqueteV1.agregarItem(traslado);
 
-	    //EXERCISE
 	    boolean resultado = paqueteV1.esValido();
 
-	    //VERIFY
 	    assertFalse(resultado);
 	    
 	    verify(hotel).esValido();
@@ -94,43 +223,34 @@ public class PaqueteTuristicoTest {
 	
 	@Test
 	public void testPaqueteSinItems() {
-	    // EXERCISE
 	    boolean resultado = paqueteV1.esValido();
 
-	    // VERIFY
 	    assertTrue(resultado);
 	}
 	
 	@Test
 	public void testAgregarItemAlPaquete() {
-		// EXERCISE
 	    paqueteV1.agregarItem(hotel);
 
-	    // VERIFY
 	    assertTrue(paqueteV1.contieneItem(hotel));
 	}
 	
 	@Test
 	public void testAgregarPaqueteAElMismo() {
-	    // EXERCISE Y VERIFY
 	    assertThrows(IllegalArgumentException.class, () -> paqueteV2.agregarItem(paqueteV2));
 	}
 	
 	@Test
 	public void testEliminarItemDelPaquete() {
-		//SETUP
 		paqueteV1.agregarItem(excursion);
 		
-		// EXERCISE
 		paqueteV1.eliminarItem(excursion);
 
-	    // VERIFY
 	    assertFalse(paqueteV1.contieneItem(excursion));
 	}
 	
 	@Test
 	public void testPaqueteConOtroPaqueteInvalido() {
-		//SETUP
 		when(hotel.esValido()).thenReturn(true);
 		when(excursion.esValido()).thenReturn(false);
 		
@@ -139,10 +259,8 @@ public class PaqueteTuristicoTest {
 		paqueteV1.agregarItem(hotel);
 		paqueteV1.agregarItem(paqueteV2);
 		
-		// EXERCISE
 		boolean resultado = paqueteV1.esValido();
 
-	    // VERIFY
 	    assertFalse(resultado);
 	    
 	    verify(hotel).esValido();
@@ -151,7 +269,6 @@ public class PaqueteTuristicoTest {
 	
 	@Test
 	public void testPaqueteConOtroPaqueteValido() {
-		//SETUP
 		when(hotel.esValido()).thenReturn(true);
 		when(traslado.esValido()).thenReturn(true);
 		
@@ -160,10 +277,8 @@ public class PaqueteTuristicoTest {
 		paqueteV1.agregarItem(hotel);
 		paqueteV1.agregarItem(paqueteV2);
 		
-		// EXERCISE
 		boolean resultado = paqueteV1.esValido();
 
-	    // VERIFY
 	    assertTrue(resultado);
 	    
 	    verify(hotel).esValido();
@@ -172,7 +287,6 @@ public class PaqueteTuristicoTest {
 	
 	@Test
 	public void testPrecioDelPaquete() {
-		//SETUP
 		when(hotel.precioFinal()).thenReturn(15000.0);
 		when(excursion.precioFinal()).thenReturn(4000.0);
 		when(traslado.precioFinal()).thenReturn(2000.0);
@@ -181,10 +295,8 @@ public class PaqueteTuristicoTest {
 		paqueteV1.agregarItem(excursion);
 		paqueteV1.agregarItem(traslado);
 		
-		// EXERCISE
 		double resultado = paqueteV1.precioFinal();
 
-	    // VERIFY
 		assertEquals(18900.0, resultado, 0.001);
 	    
 	    verify(hotel).precioFinal();
@@ -194,7 +306,6 @@ public class PaqueteTuristicoTest {
 	
 	@Test
 	public void testPrecioDelPaqueteQueTieneUnPaquete() {
-		//SETUP
 		when(hotel.precioFinal()).thenReturn(15000.0);
 		when(excursion.precioFinal()).thenReturn(4000.0);
 		when(traslado.precioFinal()).thenReturn(2000.0);
@@ -204,10 +315,8 @@ public class PaqueteTuristicoTest {
 		paqueteV1.agregarItem(hotel);
 		paqueteV1.agregarItem(paqueteV2);
 		
-		// EXERCISE
 		double resultado = paqueteV1.precioFinal();
 
-	    // VERIFY
 		assertEquals(17820.0, resultado, 0.001);
 	    
 	    verify(hotel).precioFinal();
@@ -217,93 +326,91 @@ public class PaqueteTuristicoTest {
 	
 	@Test
 	public void testCantidadDeItemsDelPaquete() {
-		//SETUP
 		paqueteV1.agregarItem(excursion);
 		paqueteV1.agregarItem(traslado);
 		paqueteV1.agregarItem(hotel);
 		paqueteV1.agregarItem(paqueteV2);
 		
-		// EXERCISE
 		int resultado = paqueteV1.cantidadItems();
 
-	    // VERIFY
 		assertEquals(4, resultado);
 	}
 	
 	@Test
 	public void testObtenerItemDelPaquete() {
-		//SETUP
 		paqueteV2.agregarItem(traslado);
 		paqueteV2.agregarItem(hotel);
 		paqueteV2.agregarItem(excursion);
 		
-		// EXERCISE
 		EntidadCatalogo resultado = paqueteV2.obtenerItem(2);
 
-	    // VERIFY
 		assertEquals(excursion, resultado);
 	}
 	
 	@Test
 	public void testEstaVacioElPaquete() {
-		// EXERCISE
 		boolean resultado = paqueteV1.estaVacio();
 
-	    // VERIFY
 		assertTrue(resultado);
 	}
 	
 	@Test
 	public void testNoEstaVacioElPaquete() {
-		//SETUP
 		paqueteV2.agregarItem(excursion);
 		
-		// EXERCISE
 		boolean resultado = paqueteV2.estaVacio();
 
-	    // VERIFY
 		assertFalse(resultado);
 	}
 	
 	@Test
 	public void testGetDescuento() {
-	    // EXERCISE
 	    double resultado = paqueteV1.getDescuento();
 
-	    // VERIFY
 	    assertEquals(0.10, resultado, 0.001);
 	}
 	
 	@Test
 	public void testGetNombre() {
-	    // EXERCISE
 	    String resultado = paqueteV1.getNombre();
 
-	    // VERIFY
 	    assertEquals("EscapadaUrbana", resultado);
 	}
 	
 	@Test
 	public void testGetDescripcion() {
-	    // EXERCISE
 	    String resultado = paqueteV1.getDescripcion();
 
-	    // VERIFY
 	    assertEquals("Escapada urbana de 3 dias.", resultado);
 	}
 	
 	@Test
 	public void testGetItems() {
-	    // SETUP
 	    paqueteV1.agregarItem(hotel);
 	    paqueteV1.agregarItem(excursion);
 
-	    // EXERCISE
 	    List<EntidadCatalogo> resultado = paqueteV1.getItems();
 
-	    // VERIFY
 	    assertEquals(2, resultado.size());
 	    assertTrue(resultado.contains(hotel));
 	    assertTrue(resultado.contains(excursion));
+	}
+	
+	@Test
+	void testObtenerServiciosIndividuales() {
+	    ServicioIndividual servicio1 = mock(ServicioIndividual.class);
+	    ServicioIndividual servicio2 = mock(ServicioIndividual.class);
+
+	    when(servicio1.obtenerServiciosIndividuales()).thenReturn(Set.of(servicio1));
+	    when(servicio2.obtenerServiciosIndividuales()).thenReturn(Set.of(servicio2));
+
+	    paqueteV1.agregarItem(servicio1);
+	    paqueteV1.agregarItem(servicio2);
+
+	    Set<ServicioIndividual> servicios = paqueteV1.obtenerServiciosIndividuales();
+
+	    assertEquals(2, servicios.size());
+	    assertTrue(servicios.contains(servicio1));
+	    assertTrue(servicios.contains(servicio2));
 	}
 }

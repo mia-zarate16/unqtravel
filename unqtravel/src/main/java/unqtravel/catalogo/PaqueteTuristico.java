@@ -2,8 +2,10 @@ package unqtravel.catalogo;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class PaqueteTuristico implements EntidadCatalogo{
 	
@@ -42,17 +44,28 @@ public class PaqueteTuristico implements EntidadCatalogo{
 	    return new ArrayList<>(items);
 	}
 	
+	@Override
+    public Set<CategoriaServicio> getCategoria() {
+        Set<CategoriaServicio> categorias = new HashSet<>();
+
+        for (EntidadCatalogo componente : items) {
+            categorias.addAll(componente.getCategoria());
+        }
+
+        return categorias;
+    }
 	
 	//									PRECIOS
-	
-	public double precioBruto() {
+	@Override
+	public double getPrecioBase() {
 		return items.stream()
 			   .mapToDouble(EntidadCatalogo::precioFinal)
 			   .sum();
 	}
 	
+	
 	public double precioFinal() {
-		return precioBruto() * (1.0 - descuento);
+		return getPrecioBase() * (1.0 - descuento);
 	}
 	
 	
@@ -120,6 +133,18 @@ public class PaqueteTuristico implements EntidadCatalogo{
 	
 	public void liberarCupos(LocalDate fechaInicio, LocalDate fechaFin, int cantidad) {
 		    items.forEach(item -> item.liberarCupos(fechaInicio, fechaFin, cantidad));
+	}
+
+
+	@Override
+	public Set<ServicioIndividual> obtenerServiciosIndividuales() {
+      Set<ServicioIndividual> servicios = new HashSet<>();
+      
+        for (EntidadCatalogo item : items) {
+	      servicios.addAll(item.obtenerServiciosIndividuales());
+	    }
+        
+	    return servicios;
 	}
 	
 	

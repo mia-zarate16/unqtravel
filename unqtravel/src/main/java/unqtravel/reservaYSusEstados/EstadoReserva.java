@@ -5,6 +5,8 @@ import unqtravel.notificaciones.ObservadorReserva;
 
 public abstract class EstadoReserva {
 	
+	public boolean esVentaEfectiva() { return true; }
+	
 	void agregarServicio(Reserva reserva, EntidadCatalogo servicio) {
 		throw new OperacionReservaInvalida("No se puede agregar un servicio a la reserva en el estado actual.");
 	}

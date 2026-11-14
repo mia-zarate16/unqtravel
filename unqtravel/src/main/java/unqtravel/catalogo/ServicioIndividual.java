@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 
 public class ServicioIndividual implements EntidadCatalogo{
@@ -63,8 +64,8 @@ public class ServicioIndividual implements EntidadCatalogo{
 		return this.descuento;
 	}
 	
-	public CategoriaServicio getCategoria() {
-		return this.categoria;
+	public Set<CategoriaServicio> getCategoria() {
+		return Set.of(categoria);
 	}
 	
 	public List<AtributoDinamico> getAtributosDinamicos() {
@@ -140,6 +141,10 @@ public class ServicioIndividual implements EntidadCatalogo{
 	    a.asignarValor(valor);
 	}
 	
+	public Integer cuposOcupados(LocalDate fecha) {
+	  return ocupados.getOrDefault(fecha,0);
+	}
+	
 	
 	//										MÉTODOS DE CUPOS
 	public boolean hayDisponibilidad(LocalDate fechaInicio,  LocalDate fechaFin, int cantidad) {
@@ -192,5 +197,11 @@ public class ServicioIndividual implements EntidadCatalogo{
 	            ocupados.put(fecha, nuevaCantidad);
 	        }
 	    }
+	}
+
+
+	@Override
+	public Set<ServicioIndividual> obtenerServiciosIndividuales() {
+	  return Set.of(this);
 	}
 }

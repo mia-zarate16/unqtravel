@@ -14,6 +14,7 @@ import unqtravel.metodoDeTrasladoYTasas.MetodoTraslado;
 public class Reserva {
 	
 	private String id;
+	private LocalDate fechaDeReserva;
 	private LocalDate fechaInicio;
 	private LocalDate fechaFin;
 	private int cantidad;
@@ -61,6 +62,7 @@ public class Reserva {
 		    throw new IllegalArgumentException("El email no puede ser nulo ni vacío.");
 		}
 		this.id = id;
+		this.fechaDeReserva = LocalDate.now();
 		this.fechaInicio = fechaInicio;
 		this.fechaFin = fechaFin;
 		this.cantidad = cantidad;
@@ -76,13 +78,11 @@ public class Reserva {
 	
 	
 	//										GETTERS
-	public String getId() {
-		return this.id;
-	}
-	
 	public LocalDate getFechaInicio() {
 		return this.fechaInicio;
 	}
+	
+	public LocalDate getFechaDeReserva() { return this.fechaDeReserva; }
 	
 	public LocalDate getFechaFin() {
 		return this.fechaFin;
@@ -100,6 +100,8 @@ public class Reserva {
 		return this.metodoDeTraslado;
 	}
 	
+	public boolean esVentaEfectiva() { return this.estadoActual.esVentaEfectiva(); }
+	
 	public int getCupoDeGuias() {
 		return this.cupoDeGuias;
 	}
@@ -115,6 +117,8 @@ public class Reserva {
 	public List<EntidadCatalogo> getItems() {
 	    return new ArrayList<>(items);
 	}
+	
+	public String getId() { return this.id; }
 	
 	
 	//										OTROS
