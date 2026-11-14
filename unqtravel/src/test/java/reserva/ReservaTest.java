@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import unqtravel.catalogo.EntidadCatalogo;
+import unqtravel.comprobantes.Comprobante;
 import unqtravel.comprobantes.RegistroComprobante;
 import unqtravel.comprobantes.VoucherReembolso;
 import unqtravel.metodoDePago.MetodoDePago;
@@ -69,11 +70,50 @@ class ReservaTest {
         );
     }
 
-    // CONSTRUCTOR
-
     @Test
-    void creaUnaReservaConDatosValidos() {
+    void testReservaConDatosValidos() {
         assertNotNull(reserva);
+    }
+    
+    @Test
+    void testConstructoresInvalidos() {
+        assertThrows(IllegalArgumentException.class,
+        		() -> new Reserva(null, fechaInicio, fechaFin, cantidad, direccion, metodoTraslado, cupoDeGuias, registro, email));
+        
+        assertThrows(IllegalArgumentException.class,
+            () -> new Reserva(" ", fechaInicio, fechaFin, cantidad,direccion, metodoTraslado, cupoDeGuias, registro, email));
+        
+        assertThrows(IllegalArgumentException.class,
+            () -> new Reserva(id, null, fechaFin, cantidad, direccion, metodoTraslado, cupoDeGuias, registro, email));
+
+        assertThrows(IllegalArgumentException.class,
+            () -> new Reserva(id, fechaInicio, null, cantidad, direccion, metodoTraslado, cupoDeGuias, registro, email));
+        assertThrows(IllegalArgumentException.class,
+            () -> new Reserva(id, fechaFin, fechaInicio, cantidad, direccion, metodoTraslado, cupoDeGuias, registro, email));
+
+        assertThrows(IllegalArgumentException.class,
+            () -> new Reserva(id, fechaInicio, fechaFin, 0, direccion, metodoTraslado, cupoDeGuias, registro, email));
+
+        assertThrows(IllegalArgumentException.class,
+            () -> new Reserva(id, fechaInicio, fechaFin, -1, direccion, metodoTraslado, cupoDeGuias, registro, email));
+
+        assertThrows(IllegalArgumentException.class,
+            () -> new Reserva(id, fechaInicio, fechaFin, cantidad, null, metodoTraslado, cupoDeGuias, registro, email));
+
+        assertThrows(IllegalArgumentException.class,
+            () -> new Reserva(id, fechaInicio, fechaFin, cantidad,direccion, null, cupoDeGuias, registro, email));
+
+        assertThrows(IllegalArgumentException.class,
+            () -> new Reserva(id, fechaInicio, fechaFin, cantidad,direccion, metodoTraslado, -1, registro, email));
+
+        assertThrows(IllegalArgumentException.class,
+            () -> new Reserva(id, fechaInicio, fechaFin, cantidad,direccion, metodoTraslado, cupoDeGuias, null, email));
+
+        assertThrows(IllegalArgumentException.class,
+            () -> new Reserva(id, fechaInicio, fechaFin, cantidad,direccion, metodoTraslado, cupoDeGuias, registro, null));
+
+        assertThrows(IllegalArgumentException.class,
+            () -> new Reserva(id, fechaInicio, fechaFin, cantidad,direccion, metodoTraslado, cupoDeGuias, registro, " "));
     }
 
     @Test
@@ -187,6 +227,18 @@ class ReservaTest {
         reserva.agregarObservador(observador);
 
         assertThrows(IllegalArgumentException.class,() -> reserva.agregarObservador(observador));
+    }
+    
+    @Test
+    void testHayDisponibilidadEnPuntoDeEncuentro() {
+        assertTrue(reserva.hayDisponibilidadEnPuntoDeEncuentro());
+    }
+
+    @Test
+    void testNoHayDisponibilidadEnPuntoDeEncuentro() {
+        Reserva reservaSinCupos = new Reserva(id, fechaInicio, fechaFin, cantidad, direccion, metodoTraslado, 0, registro, email);
+
+        assertFalse(reservaSinCupos.hayDisponibilidadEnPuntoDeEncuentro());
     }
    
     @Test
@@ -347,5 +399,29 @@ class ReservaTest {
     @Test
     void verificarVentasEfectivas() {
     	assertFalse(reserva.esVentaEfectiva());
+    }
+    
+    @Test
+    void testPagarSinMetodoDePago() {
+        assertThrows(IllegalStateException.class, () -> reserva.pagar(1500.0));
+    }
+    
+    @Test
+    void testPagarCorrectamente() {
+        MetodoDePago metodo = mock(MetodoDePago.class);
+        Comprobante comprobante = mock(Comprobante.class);
+
+        when(metodo.procesarPago(1500.0)).thenReturn("TX-123");
+        when(metodo.crearComprobante("TX-123")).thenReturn(comprobante);
+
+        reserva.seleccionarMetodoDePago(metodo);
+
+        String codigo = reserva.pagar(1500.0);
+
+        assertEquals("TX-123", codigo);
+
+        verify(metodo).procesarPago(1500.0);
+        verify(metodo).crearComprobante("TX-123");
+        verify(registro).registrarComprobante(comprobante);
     }
 }
